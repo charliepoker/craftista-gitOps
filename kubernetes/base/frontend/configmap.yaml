@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  labels:
+    app: frontend
+data:
+  NODE_ENV: "production"
+  PRODUCTS_API_BASE_URI: "http://catalogue:5000"
+  RECOMMENDATION_BASE_URI: "http://recommendation:8080"
+  VOTING_BASE_URI: "http://voting:8080"

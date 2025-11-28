@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: voting-migration
+  labels:
+    app: voting
+    component: migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: voting
+        component: migration
+    spec:
+      restartPolicy: Never
+      serviceAccountName: voting
+      containers:
+        - name: flyway-migration
+          image: charliepoker/craftista-voting:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting Flyway database migration..."
+              java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true
+              echo "Migration completed successfully"
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: voting-postgres-secret
+                  key: url
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: voting-postgres-secret
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: voting-postgres-secret
+                  key: password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

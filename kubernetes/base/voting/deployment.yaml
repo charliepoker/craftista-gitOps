@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting
+  labels:
+    app: voting
+    component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting
+  template:
+    metadata:
+      labels:
+        app: voting
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "voting"
+        vault.hashicorp.com/agent-inject-secret-postgres: "secret/data/craftista/ENV/voting/postgres"
+    spec:
+      serviceAccountName: voting
+      containers:
+        - name: voting
+          image: charliepoker/craftista-voting:latest
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: voting-postgres-secret
+                  key: url
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: voting-postgres-secret
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: voting-postgres-secret
+                  key: password
+            - name: DATABASE_MAX_CONNECTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: DATABASE_MAX_CONNECTIONS
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: LOG_LEVEL
+            - name: CATALOGUE_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: CATALOGUE_SERVICE_URL
+            - name: APP_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: APP_VERSION
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3

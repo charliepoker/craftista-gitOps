@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation
+  labels:
+    app: recommendation
+    component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation
+  template:
+    metadata:
+      labels:
+        app: recommendation
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "recommendation"
+        vault.hashicorp.com/agent-inject-secret-redis: "secret/data/craftista/ENV/recommendation/redis"
+    spec:
+      serviceAccountName: recommendation
+      containers:
+        - name: recommendation
+          image: charliepoker/craftista-recommendation:latest
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: recommendation-redis-secret
+                  key: host
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: recommendation-redis-secret
+                  key: port
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: recommendation-redis-secret
+                  key: password
+            - name: REDIS_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: recommendation-config
+                  key: REDIS_DB
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: recommendation-config
+                  key: LOG_LEVEL
+            - name: GIN_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: recommendation-config
+                  key: GIN_MODE
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3

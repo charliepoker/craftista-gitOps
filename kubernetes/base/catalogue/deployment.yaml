@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue
+  labels:
+    app: catalogue
+    component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalogue
+  template:
+    metadata:
+      labels:
+        app: catalogue
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "catalogue"
+        vault.hashicorp.com/agent-inject-secret-mongodb: "secret/data/craftista/ENV/catalogue/mongodb"
+    spec:
+      serviceAccountName: catalogue
+      containers:
+        - name: catalogue
+          image: charliepoker/craftista-catalogue:latest
+          ports:
+            - containerPort: 5000
+              name: http
+              protocol: TCP
+          env:
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: FLASK_ENV
+            - name: FLASK_DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: FLASK_DEBUG
+            - name: DATA_SOURCE
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: DATA_SOURCE
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: LOG_LEVEL
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: catalogue-mongodb-secret
+                  key: uri
+            - name: MONGODB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: MONGODB_DATABASE
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/products
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3

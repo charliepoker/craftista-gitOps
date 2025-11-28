@@ -1,0 +1,70 @@
+# Kubernetes and Helm artifacts
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Helm
+*.tgz
+.helm/
+charts/*/charts/
+charts/*/Chart.lock
+requirements.lock
+
+# Kustomize
+kustomization.yaml.bak
+
+# Secrets (never commit actual secrets)
+*secret*.yaml
+*secrets*.yaml
+!*secret*-template.yaml
+!*secrets*-template.yaml
+!external-secrets/
+
+# Terraform state (if any)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+dist/
+build/
+venv/
+env/
+
+# Test outputs
+test-results/
+coverage/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# ArgoCD local config
+argocd-local-config/
+
+# Vault tokens (never commit)
+.vault-token
+vault-token
+
+# Environment-specific overrides (use templates instead)
+*-override.yaml
+*-local.yaml
+
+# Backup files
+*.bak
+*.backup
