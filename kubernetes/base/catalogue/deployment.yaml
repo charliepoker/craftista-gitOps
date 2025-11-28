@@ -22,7 +22,7 @@ spec:
       serviceAccountName: catalogue
       containers:
         - name: catalogue
-          image: charliepoker/craftista-catalogue:latest
+          image: 8060633493/craftista-catalogue:latest
           ports:
             - containerPort: 5000
               name: http

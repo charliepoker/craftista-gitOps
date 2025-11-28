@@ -22,7 +22,7 @@ spec:
       serviceAccountName: recommendation
       containers:
         - name: recommendation
-          image: charliepoker/craftista-recommendation:latest
+          image: 8060633493/craftista-recommendation:latest
           ports:
             - containerPort: 8080
               name: http

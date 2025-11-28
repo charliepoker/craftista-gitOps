@@ -22,7 +22,7 @@ spec:
       serviceAccountName: frontend
       containers:
         - name: frontend
-          image: charliepoker/craftista-frontend:latest
+          image: 8060633493/craftista-frontend:latest
           ports:
             - containerPort: 3000
               name: http
