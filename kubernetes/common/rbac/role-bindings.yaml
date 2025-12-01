@@ -1,0 +1,151 @@
+# RoleBindings for Craftista Microservices
+# Binds ServiceAccounts to their respective Roles
+# Environment-specific bindings use different roles (prod roles are more restrictive)
+
+---
+# Frontend RoleBinding - Dev/Staging
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frontend-rolebinding
+  labels:
+    app: frontend
+    component: web
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: frontend-role
+subjects:
+  - kind: ServiceAccount
+    name: frontend
+
+---
+# Frontend RoleBinding - Production
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frontend-rolebinding-prod
+  labels:
+    app: frontend
+    component: web
+    environment: production
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: frontend-role-prod
+subjects:
+  - kind: ServiceAccount
+    name: frontend
+
+---
+# Catalogue RoleBinding - Dev/Staging
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: catalogue-rolebinding
+  labels:
+    app: catalogue
+    component: api
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: catalogue-role
+subjects:
+  - kind: ServiceAccount
+    name: catalogue
+
+---
+# Catalogue RoleBinding - Production
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: catalogue-rolebinding-prod
+  labels:
+    app: catalogue
+    component: api
+    environment: production
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: catalogue-role-prod
+subjects:
+  - kind: ServiceAccount
+    name: catalogue
+
+---
+# Voting RoleBinding - Dev/Staging
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: voting-rolebinding
+  labels:
+    app: voting
+    component: api
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: voting-role
+subjects:
+  - kind: ServiceAccount
+    name: voting
+
+---
+# Voting RoleBinding - Production
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: voting-rolebinding-prod
+  labels:
+    app: voting
+    component: api
+    environment: production
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: voting-role-prod
+subjects:
+  - kind: ServiceAccount
+    name: voting
+
+---
+# Recommendation RoleBinding - Dev/Staging
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: recommendation-rolebinding
+  labels:
+    app: recommendation
+    component: api
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: recommendation-role
+subjects:
+  - kind: ServiceAccount
+    name: recommendation
+
+---
+# Recommendation RoleBinding - Production
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: recommendation-rolebinding-prod
+  labels:
+    app: recommendation
+    component: api
+    environment: production
+    managed-by: gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: recommendation-role-prod
+subjects:
+  - kind: ServiceAccount
+    name: recommendation

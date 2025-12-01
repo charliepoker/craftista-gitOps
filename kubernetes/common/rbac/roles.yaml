@@ -1,0 +1,254 @@
+# Roles for Craftista Microservices
+# Following least-privilege principle - each service gets only the permissions it needs
+# Production roles are more restrictive than dev roles
+
+---
+# Frontend Role - Minimal permissions for web service
+# Frontend needs to read its own ConfigMaps and Secrets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: frontend-role
+  labels:
+    app: frontend
+    component: web
+    managed-by: gitops
+rules:
+  # Allow reading own ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+    resourceNames: ["frontend-config"]
+
+  # Allow reading own Secrets (for Vault integration)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames: ["frontend-secrets", "frontend-vault-token"]
+
+  # Allow reading own Service for service discovery
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get"]
+    resourceNames: ["frontend"]
+
+---
+# Frontend Role - Production (more restrictive)
+# Production removes list permissions and limits to specific resources only
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: frontend-role-prod
+  labels:
+    app: frontend
+    component: web
+    environment: production
+    managed-by: gitops
+rules:
+  # Allow reading only specific ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+    resourceNames: ["frontend-config"]
+
+  # Allow reading only specific Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames: ["frontend-secrets", "frontend-vault-token"]
+
+---
+# Catalogue Role - Minimal permissions for API service
+# Catalogue needs to read its own ConfigMaps and Secrets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: catalogue-role
+  labels:
+    app: catalogue
+    component: api
+    managed-by: gitops
+rules:
+  # Allow reading own ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+    resourceNames: ["catalogue-config"]
+
+  # Allow reading own Secrets (for database credentials)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      [
+        "catalogue-secrets",
+        "catalogue-vault-token",
+        "catalogue-mongodb-credentials",
+      ]
+
+  # Allow reading own Service for service discovery
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get"]
+    resourceNames: ["catalogue"]
+
+---
+# Catalogue Role - Production (more restrictive)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: catalogue-role-prod
+  labels:
+    app: catalogue
+    component: api
+    environment: production
+    managed-by: gitops
+rules:
+  # Allow reading only specific ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+    resourceNames: ["catalogue-config"]
+
+  # Allow reading only specific Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      [
+        "catalogue-secrets",
+        "catalogue-vault-token",
+        "catalogue-mongodb-credentials",
+      ]
+
+---
+# Voting Role - Minimal permissions for API service
+# Voting needs to read its own ConfigMaps, Secrets, and check migration job status
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: voting-role
+  labels:
+    app: voting
+    component: api
+    managed-by: gitops
+rules:
+  # Allow reading own ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+    resourceNames: ["voting-config"]
+
+  # Allow reading own Secrets (for database credentials)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      ["voting-secrets", "voting-vault-token", "voting-postgres-credentials"]
+
+  # Allow reading own Service for service discovery
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get"]
+    resourceNames: ["voting"]
+
+  # Allow reading migration job status (for health checks)
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list"]
+    resourceNames: ["voting-migration"]
+
+---
+# Voting Role - Production (more restrictive)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: voting-role-prod
+  labels:
+    app: voting
+    component: api
+    environment: production
+    managed-by: gitops
+rules:
+  # Allow reading only specific ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+    resourceNames: ["voting-config"]
+
+  # Allow reading only specific Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      ["voting-secrets", "voting-vault-token", "voting-postgres-credentials"]
+
+  # Allow reading migration job status (read-only)
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get"]
+    resourceNames: ["voting-migration"]
+
+---
+# Recommendation Role - Minimal permissions for API service
+# Recommendation needs to read its own ConfigMaps and Secrets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: recommendation-role
+  labels:
+    app: recommendation
+    component: api
+    managed-by: gitops
+rules:
+  # Allow reading own ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+    resourceNames: ["recommendation-config"]
+
+  # Allow reading own Secrets (for Redis credentials)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      [
+        "recommendation-secrets",
+        "recommendation-vault-token",
+        "recommendation-redis-credentials",
+      ]
+
+  # Allow reading own Service for service discovery
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get"]
+    resourceNames: ["recommendation"]
+
+---
+# Recommendation Role - Production (more restrictive)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: recommendation-role-prod
+  labels:
+    app: recommendation
+    component: api
+    environment: production
+    managed-by: gitops
+rules:
+  # Allow reading only specific ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+    resourceNames: ["recommendation-config"]
+
+  # Allow reading only specific Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      [
+        "recommendation-secrets",
+        "recommendation-vault-token",
+        "recommendation-redis-credentials",
+      ]
