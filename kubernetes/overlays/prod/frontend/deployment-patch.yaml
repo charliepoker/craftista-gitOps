@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/prod/frontend/config"
+    spec:
+      containers:
+        - name: frontend
+          image: 8060633493/craftista-frontend:prod-latest

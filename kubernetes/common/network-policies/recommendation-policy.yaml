@@ -1,0 +1,66 @@
+---
+# NetworkPolicy for Recommendation service
+# Allows:
+# - Ingress from frontend service
+# - Egress to Redis (ElastiCache)
+# - Egress to DNS for service discovery
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: recommendation-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: recommendation
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from frontend service
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # Allow egress to Redis/ElastiCache
+    # Redis typically runs on port 6379
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow egress to external Redis/ElastiCache (AWS ElastiCache)
+    # This allows connection to managed cache services outside the cluster
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow egress to CoreDNS (alternative DNS)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow HTTPS for external ElastiCache connections
+    - ports:
+        - protocol: TCP
+          port: 443

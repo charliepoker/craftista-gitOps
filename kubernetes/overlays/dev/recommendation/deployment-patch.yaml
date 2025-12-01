@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation
+spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/dev/recommendation/config"
+    spec:
+      containers:
+        - name: recommendation
+          image: 8060633493/craftista-recommendation:dev-latest

@@ -1,0 +1,74 @@
+---
+# NetworkPolicy for Catalogue service
+# Allows:
+# - Ingress from frontend and voting services
+# - Egress to MongoDB (DocumentDB)
+# - Egress to DNS for service discovery
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: catalogue-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: catalogue
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from frontend service
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow traffic from voting service
+    - from:
+        - podSelector:
+            matchLabels:
+              app: voting
+      ports:
+        - protocol: TCP
+          port: 5000
+  egress:
+    # Allow egress to MongoDB/DocumentDB
+    # MongoDB typically runs on port 27017
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mongodb
+      ports:
+        - protocol: TCP
+          port: 27017
+    # Allow egress to external MongoDB/DocumentDB (AWS DocumentDB)
+    # This allows connection to managed database services outside the cluster
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 27017
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow egress to CoreDNS (alternative DNS)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow HTTPS for external DocumentDB connections
+    - ports:
+        - protocol: TCP
+          port: 443

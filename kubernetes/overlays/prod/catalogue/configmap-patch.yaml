@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalogue-config
+data:
+  FLASK_ENV: "production"
+  FLASK_DEBUG: "False"
+  DATA_SOURCE: "mongodb"
+  LOG_LEVEL: "WARNING"
+  MONGODB_DATABASE: "catalogue"

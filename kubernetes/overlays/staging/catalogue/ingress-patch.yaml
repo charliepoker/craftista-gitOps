@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalogue
+spec:
+  tls:
+    - hosts:
+        - catalogue.staging.webdemoapp.com
+      secretName: catalogue-staging-tls
+  rules:
+    - host: catalogue.staging.webdemoapp.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalogue
+                port:
+                  number: 5000

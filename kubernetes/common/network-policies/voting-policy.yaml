@@ -1,0 +1,75 @@
+---
+# NetworkPolicy for Voting service
+# Allows:
+# - Ingress from frontend service
+# - Egress to PostgreSQL (RDS)
+# - Egress to catalogue service
+# - Egress to DNS for service discovery
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: voting-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: voting
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from frontend service
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # Allow egress to PostgreSQL/RDS
+    # PostgreSQL typically runs on port 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow egress to external PostgreSQL/RDS (AWS RDS)
+    # This allows connection to managed database services outside the cluster
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow egress to catalogue service
+    - to:
+        - podSelector:
+            matchLabels:
+              app: catalogue
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow egress to CoreDNS (alternative DNS)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow HTTPS for external RDS connections
+    - ports:
+        - protocol: TCP
+          port: 443

@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: craftista-dev
+
+resources:
+  - ../../../base/recommendation
+
+commonLabels:
+  environment: dev
+
+patches:
+  - path: deployment-patch.yaml
+    target:
+      kind: Deployment
+      name: recommendation
+  - path: resources-patch.yaml
+    target:
+      kind: Deployment
+      name: recommendation
+  - path: configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: recommendation-config
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: recommendation
+
+replicas:
+  - name: recommendation
+    count: 1

@@ -1,0 +1,36 @@
+---
+# Default deny all ingress and egress traffic
+# This policy applies to all pods in the namespace and denies all traffic by default
+# Specific policies must be created to allow required traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: craftista-dev
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: craftista-staging
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: craftista-prod
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

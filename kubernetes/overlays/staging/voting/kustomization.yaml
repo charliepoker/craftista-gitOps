@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: craftista-staging
+
+resources:
+  - ../../../base/voting
+
+commonLabels:
+  environment: staging
+
+patches:
+  - path: deployment-patch.yaml
+    target:
+      kind: Deployment
+      name: voting
+  - path: resources-patch.yaml
+    target:
+      kind: Deployment
+      name: voting
+  - path: configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: voting-config
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: voting
+
+replicas:
+  - name: voting
+    count: 2
