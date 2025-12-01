@@ -183,4 +183,4 @@ If services cannot communicate:
 
 - [Kubernetes NetworkPolicy Documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 - [NetworkPolicy Recipes](https://github.com/ahmetb/kubernetes-network-policy-recipes)
-- Requirement 14.1: NetworkPolicies SHALL restrict pod-to-pod communication to only required service dependencies
+
