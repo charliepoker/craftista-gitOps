@@ -1,0 +1,48 @@
+replicaCount: 2
+
+image:
+  tag: "staging-latest"
+
+ingress:
+  hosts:
+    - host: recommendation.staging.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: recommendation-staging-tls
+      hosts:
+        - recommendation.staging.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  - name: GIN_MODE
+    value: release
+  - name: LOG_LEVEL
+    value: INFO
+
+redis:
+  enabled: true
+  host: "" # Injected from Vault
+  port: 6379
+  password: "" # Injected from Vault
+  database: 0
+
+vault:
+  enabled: true
+  role: recommendation
+  secretPath: secret/data/craftista/staging/recommendation

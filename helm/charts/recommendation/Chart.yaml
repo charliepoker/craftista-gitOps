@@ -1,0 +1,14 @@
+apiVersion: v2
+name: recommendation
+description: Craftista Recommendation Service Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - craftista
+  - recommendation
+  - golang
+  - redis
+maintainers:
+  - name: Obinna Iheanacho
+    email: Iheanachocharlie@gmail.com

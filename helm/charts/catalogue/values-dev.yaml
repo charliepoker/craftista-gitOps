@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  tag: "dev-latest"
+
+ingress:
+  hosts:
+    - host: catalogue.dev.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: catalogue-dev-tls
+      hosts:
+        - catalogue.dev.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+
+env:
+  - name: FLASK_ENV
+    value: development
+  - name: FLASK_APP
+    value: app.py
+  - name: DATA_SOURCE
+    value: mongodb
+  - name: LOG_LEVEL
+    value: DEBUG
+  - name: FLASK_DEBUG
+    value: "true"
+
+mongodb:
+  enabled: true
+  uri: "" # Injected from Vault
+  database: catalogue
+  host: "" # Injected from Vault
+  username: "" # Injected from Vault
+  password: "" # Injected from Vault
+
+vault:
+  enabled: true
+  role: catalogue
+  secretPath: secret/data/craftista/dev/catalogue

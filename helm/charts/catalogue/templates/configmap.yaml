@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "catalogue.fullname" . }}-config
+  labels:
+    {{- include "catalogue.labels" . | nindent 4 }}
+data:
+  config.json: |
+    {
+      "app_version": "{{ .Chart.AppVersion }}",
+      "data_source": "{{ (index .Values.env 2).value }}",
+      "db_host": "catalogue-mongodb",
+      "db_name": "{{ .Values.mongodb.database }}",
+      "db_user": "catalogue",
+      "db_password": "placeholder"
+    }

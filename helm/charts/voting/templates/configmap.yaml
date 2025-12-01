@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "voting.fullname" . }}-config
+  labels:
+    {{- include "voting.labels" . | nindent 4 }}
+data:
+  application.yml: |
+    spring:
+      profiles:
+        active: {{ (index .Values.env 0).value }}
+      datasource:
+        hikari:
+          maximum-pool-size: 10
+          connection-timeout: 20000
+      jpa:
+        hibernate:
+          ddl-auto: {{ (index .Values.env 4).value }}
+        show-sql: {{ (index .Values.env 5).value }}
+      flyway:
+        enabled: true
+        locations: classpath:db/migration
+        baseline-on-migrate: true
+    
+    catalogue:
+      service-url: {{ (index .Values.env 1).value }}
+      sync-interval: {{ (index .Values.env 2).value }}
+    
+    logging:
+      level:
+        com.example.voting: {{ (index .Values.env 3).value }}
+    
+    app:
+      name: voting-service
+      version: {{ .Chart.AppVersion }}

@@ -1,0 +1,49 @@
+replicaCount: 2
+
+image:
+  tag: "staging-latest"
+
+ingress:
+  hosts:
+    - host: frontend.staging.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: frontend-staging-tls
+      hosts:
+        - frontend.staging.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  - name: NODE_ENV
+    value: production
+  - name: PORT
+    value: "3000"
+  - name: PRODUCTS_API_BASE_URI
+    value: http://catalogue:5000
+  - name: RECOMMENDATION_BASE_URI
+    value: http://recommendation:8080
+  - name: VOTING_BASE_URI
+    value: http://voting:8080
+  - name: LOG_LEVEL
+    value: info
+
+vault:
+  enabled: true
+  role: frontend
+  secretPath: secret/data/craftista/staging/frontend

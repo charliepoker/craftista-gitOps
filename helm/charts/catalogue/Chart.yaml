@@ -1,0 +1,14 @@
+apiVersion: v2
+name: catalogue
+description: Craftista Catalogue Service Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - craftista
+  - catalogue
+  - python
+  - flask
+maintainers:
+  - name: Obinna Iheanacho
+    email: Iheanachocharlie@gmail.com

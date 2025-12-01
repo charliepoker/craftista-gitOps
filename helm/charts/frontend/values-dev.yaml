@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  tag: "dev-latest"
+
+ingress:
+  hosts:
+    - host: frontend.dev.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: frontend-dev-tls
+      hosts:
+        - frontend.dev.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+
+env:
+  - name: NODE_ENV
+    value: development
+  - name: PORT
+    value: "3000"
+  - name: PRODUCTS_API_BASE_URI
+    value: http://catalogue:5000
+  - name: RECOMMENDATION_BASE_URI
+    value: http://recommendation:8080
+  - name: VOTING_BASE_URI
+    value: http://voting:8080
+  - name: LOG_LEVEL
+    value: debug
+
+vault:
+  enabled: true
+  role: frontend
+  secretPath: secret/data/craftista/dev/frontend

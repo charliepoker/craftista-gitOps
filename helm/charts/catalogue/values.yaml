@@ -1,0 +1,106 @@
+replicaCount: 1
+
+image:
+  repository: 8060633493/craftista-catalogue
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "catalogue"
+
+podAnnotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "catalogue"
+  vault.hashicorp.com/agent-inject-secret-db-config: "secret/data/craftista/ENV/catalogue/database"
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: catalogue.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: catalogue-tls
+      hosts:
+        - catalogue.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 5000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/products
+    port: 5000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+env:
+  - name: FLASK_ENV
+    value: production
+  - name: FLASK_APP
+    value: app.py
+  - name: DATA_SOURCE
+    value: mongodb
+  - name: LOG_LEVEL
+    value: INFO
+
+mongodb:
+  enabled: true
+  uri: "" # Injected from Vault
+  database: catalogue
+  host: "" # Injected from Vault
+  username: "" # Injected from Vault
+  password: "" # Injected from Vault
+
+vault:
+  enabled: true
+  role: catalogue
+  secretPath: secret/data/craftista/ENV/catalogue

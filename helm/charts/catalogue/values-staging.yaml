@@ -1,0 +1,53 @@
+replicaCount: 2
+
+image:
+  tag: "staging-latest"
+
+ingress:
+  hosts:
+    - host: catalogue.staging.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: catalogue-staging-tls
+      hosts:
+        - catalogue.staging.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  - name: FLASK_ENV
+    value: production
+  - name: FLASK_APP
+    value: app.py
+  - name: DATA_SOURCE
+    value: mongodb
+  - name: LOG_LEVEL
+    value: INFO
+
+mongodb:
+  enabled: true
+  uri: "" # Injected from Vault
+  database: catalogue
+  host: "" # Injected from Vault
+  username: "" # Injected from Vault
+  password: "" # Injected from Vault
+
+vault:
+  enabled: true
+  role: catalogue
+  secretPath: secret/data/craftista/staging/catalogue

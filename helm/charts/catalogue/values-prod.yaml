@@ -1,0 +1,53 @@
+replicaCount: 3
+
+image:
+  tag: "prod-latest"
+
+ingress:
+  hosts:
+    - host: catalogue.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: catalogue-prod-tls
+      hosts:
+        - catalogue.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  - name: FLASK_ENV
+    value: production
+  - name: FLASK_APP
+    value: app.py
+  - name: DATA_SOURCE
+    value: mongodb
+  - name: LOG_LEVEL
+    value: WARN
+
+mongodb:
+  enabled: true
+  uri: "" # Injected from Vault
+  database: catalogue
+  host: "" # Injected from Vault
+  username: "" # Injected from Vault
+  password: "" # Injected from Vault
+
+vault:
+  enabled: true
+  role: catalogue
+  secretPath: secret/data/craftista/prod/catalogue

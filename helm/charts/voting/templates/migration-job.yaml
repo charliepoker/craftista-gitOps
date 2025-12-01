@@ -1,0 +1,68 @@
+{{- if .Values.migration.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "voting.fullname" . }}-migration
+  labels:
+    {{- include "voting.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migration
+  annotations:
+    {{- with .Values.migration.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: {{ .Values.migration.backoffLimit }}
+  activeDeadlineSeconds: {{ .Values.migration.activeDeadlineSeconds }}
+  template:
+    metadata:
+      labels:
+        {{- include "voting.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: migration
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: {{ .Values.vault.role | quote }}
+        vault.hashicorp.com/agent-inject-secret-db-config: {{ .Values.vault.secretPath }}/database
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "voting.serviceAccountName" . }}
+      containers:
+      - name: flyway-migration
+        image: "{{ .Values.migration.image.repository }}:{{ .Values.migration.image.tag | default .Values.image.tag }}"
+        command:
+          - /bin/sh
+          - -c
+          - |
+            echo "Starting Flyway database migration..."
+            java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: {{ (index .Values.env 0).value | quote }}
+        {{- if .Values.postgresql.enabled }}
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "voting.fullname" . }}-secrets
+              key: database-url
+        - name: DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "voting.fullname" . }}-secrets
+              key: database-username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "voting.fullname" . }}-secrets
+              key: database-password
+        {{- end }}
+        - name: SPRING_FLYWAY_ENABLED
+          value: "true"
+        - name: SPRING_FLYWAY_BASELINE_ON_MIGRATE
+          value: "true"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+{{- end }}

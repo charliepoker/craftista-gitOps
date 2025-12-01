@@ -1,0 +1,121 @@
+replicaCount: 1
+
+image:
+  repository: 8060633493/craftista-voting
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "voting"
+
+podAnnotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "voting"
+  vault.hashicorp.com/agent-inject-secret-db-config: "secret/data/craftista/ENV/voting/database"
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: voting.webdemoapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: voting-tls
+      hosts:
+        - voting.webdemoapp.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: production
+  - name: CATALOGUE_SERVICE_URL
+    value: http://catalogue:5000/api/products
+  - name: CATALOGUE_SYNC_INTERVAL
+    value: "60000"
+  - name: LOG_LEVEL
+    value: INFO
+  - name: JPA_DDL_AUTO
+    value: validate
+  - name: JPA_SHOW_SQL
+    value: "false"
+
+postgresql:
+  enabled: true
+  host: "" # Injected from Vault
+  port: 5432
+  database: voting
+  username: "" # Injected from Vault
+  password: "" # Injected from Vault
+
+migration:
+  enabled: true
+  image:
+    repository: charliepoker/craftista-voting
+    tag: "latest"
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-1"
+
+vault:
+  enabled: true
+  role: voting
+  secretPath: secret/data/craftista/ENV/voting
