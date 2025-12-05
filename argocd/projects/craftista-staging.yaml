@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: craftista-staging
+  namespace: argocd
+  labels:
+    environment: staging
+spec:
+  description: Craftista Staging Environment
+
+  # Source repositories that applications in this project can deploy from
+  sourceRepos:
+    - https://github.com/charliepoker/craftista-gitops.git
+
+  # Destinations where applications can be deployed
+  destinations:
+    - namespace: craftista-staging
+      server: https://kubernetes.default.svc
+
+  # Cluster-scoped resources that can be managed
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+
+  # Namespace-scoped resources that can be managed
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # Roles for project members (can be extended for RBAC)
+  roles: []
