@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: craftista-voting-dev
+  namespace: argocd
+  labels:
+    app: voting
+    environment: dev
+    component: api
+spec:
+  # Project reference
+  project: craftista-dev
+
+  # Source configuration
+  source:
+    repoURL: https://github.com/charliepoker/craftista-gitops.git
+    targetRevision: main
+    path: kubernetes/overlays/dev/voting
+
+  # Destination configuration
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: craftista-dev
+
+  # Sync policy configuration
+  syncPolicy:
+    automated:
+      prune: true # Automatically delete resources that are no longer defined in Git
+      selfHeal: true # Automatically sync when cluster state deviates from Git
+      allowEmpty: false # Prevent deletion of all resources
+    syncOptions:
+      - CreateNamespace=true # Automatically create namespace if it doesn't exist
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignore differences for fields that are expected to change
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas # Ignore replica count changes (managed by HPA)
