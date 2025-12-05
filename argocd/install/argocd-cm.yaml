@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Repository credentials and configuration
+  # The GitOps repository will be added here
+  repositories: |
+    - url: https://github.com/charliepoker/craftista-gitops.git
+      name: craftista-gitops
+      type: git
+    - url: https://github.com/charliepoker/craftista.git
+      name: craftista
+      type: git
+    - url: https://github.com/charliepoker/Craftista-IaC.git
+      name: craftista-iac
+      type: git
+
+  # Repository credentials template
+  # For private repositories, credentials should be stored in Vault
+  # and injected via External Secrets Operator
+  repository.credentials: |
+    - url: https://github.com/charliepoker
+      usernameSecret:
+        name: github-credentials
+        key: username
+      passwordSecret:
+        name: github-credentials
+        key: password
+
+  # Application settings
+  application.instanceLabelKey: argocd.argoproj.io/instance
+
+  # Timeout settings
+  timeout.reconciliation: 180s
+  timeout.hard.reconciliation: 0
+
+  # Resource tracking method
+  # Options: label, annotation, annotation+label
+  application.resourceTrackingMethod: annotation+label
+
+  # Diff customization
+  resource.customizations: |
+    # Ignore differences in replicas for HPA-managed deployments
+    apps/Deployment:
+      ignoreDifferences: |
+        jsonPointers:
+        - /spec/replicas
+
+    # Ignore differences in HPA status
+    autoscaling/HorizontalPodAutoscaler:
+      ignoreDifferences: |
+        jsonPointers:
+        - /status
+
+  # Kustomize build options
+  kustomize.buildOptions: --enable-helm
+
+  # Helm settings
+  helm.valuesFileSchemes: https, http
+
+  # Server configuration
+  url: https://argocd.webdemoapp.com
+
+  # Enable anonymous access (set to false for production)
+  users.anonymous.enabled: "false"
+
+  # Admin settings
+  admin.enabled: "true"
+
+  # Dex (SSO) configuration
+  # Uncomment and configure for SSO integration
+  # dex.config: |
+  #   connectors:
+  #   - type: github
+  #     id: github
+  #     name: GitHub
+  #     config:
+  #       clientID: $dex.github.clientId
+  #       clientSecret: $dex.github.clientSecret
+  #       orgs:
+  #       - name: your-github-org
+
+  # Webhook configuration for GitHub
+  # This allows GitHub to notify ArgoCD of repository changes
+  webhook.github.secret: "" # Should be injected from Vault
+
+  # Status badge configuration
+  statusbadge.enabled: "true"
+
+  # Resource exclusions
+  # Resources that ArgoCD should ignore
+  resource.exclusions: |
+    - apiGroups:
+      - cilium.io
+      kinds:
+      - CiliumIdentity
+      clusters:
+      - "*"
+
+  # Resource inclusions
+  # Additional resources ArgoCD should manage
+  resource.inclusions: |
+    - apiGroups:
+      - "*"
+      kinds:
+      - "*"
+      clusters:
+      - "*"
+
+  # Config management plugins
+  # For custom config management tools
+  configManagementPlugins: |
+    # Example: Kustomize with Helm support
+    - name: kustomize-helm
+      generate:
+        command: ["sh", "-c"]
+        args: ["kustomize build --enable-helm"]
+
+  # Notification settings
+  # Integrates with argocd-notifications for Slack, email, etc.
+  # notifications.enabled: "true"
+
+  # Accounts configuration
+  # Additional user accounts (beyond admin)
+  accounts.developer: apiKey, login
+  accounts.readonly: login
+
+  # GA (Google Analytics) tracking
+  # ga.trackingid: ""
+  # ga.anonymizeusers: "false"
+
+  # Help chat configuration
+  # help.chatUrl: "https://slack.example.com"
+  # help.chatText: "Chat with us on Slack"
+
+  # OIDCConfig for SSO
+  # oidc.config: |
+  #   name: GitHub
+  #   issuer: https://github.com
+  #   clientID: $oidc.github.clientId
+  #   clientSecret: $oidc.github.clientSecret
+  #   requestedScopes: ["openid", "profile", "email", "groups"]
+
+  # Banner message (useful for maintenance notifications)
+  # ui.bannercontent: "Maintenance window: Saturday 2AM-4AM UTC"
+  # ui.bannerurl: "https://status.example.com"
+  # ui.bannerpermanent: "false"
+
+  # Custom CSS for UI
+  # ui.cssurl: "https://example.com/custom.css"
