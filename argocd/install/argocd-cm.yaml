@@ -37,7 +37,7 @@ data:
 
   # Timeout settings
   timeout.reconciliation: 180s
-  timeout.hard.reconciliation: 0
+  timeout.hard.reconciliation: "0"
 
   # Resource tracking method
   # Options: label, annotation, annotation+label
@@ -64,7 +64,7 @@ data:
   helm.valuesFileSchemes: https, http
 
   # Server configuration
-  url: https://argocd.webdemoapp.com
+  # url: https://argocd.webdemoapp.com
 
   # Enable anonymous access (set to false for production)
   users.anonymous.enabled: "false"
