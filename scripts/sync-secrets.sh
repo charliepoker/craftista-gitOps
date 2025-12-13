@@ -13,8 +13,9 @@
 #   ./sync-secrets.sh --environment <env> [options]
 #
 # Options:
-#   --environment    Target environment (dev, staging, prod) [required]
+#   --environment    Target environment (dev, staging, prod) [required for app secrets]
 #   --service        Specific service to sync (optional, syncs all if not specified)
+#   --type           Secret type (github-actions for CI/CD secrets)
 #   --vault-addr     Vault server address [default: from VAULT_ADDR env]
 #   --vault-token    Vault root token [default: from VAULT_TOKEN env]
 #   --interactive    Prompt for secrets interactively
@@ -102,14 +103,14 @@ check_prerequisites() {
         exit 1
     fi
 
-    # Validate environment
+    # Validate environment (skip for CI/CD secrets)
     if [[ -z "${ENVIRONMENT}" ]]; then
-        log_error "Environment is required. Use --environment flag."
+        log_error "Environment is required. Use --environment flag or --type github-actions."
         exit 1
     fi
 
-    if [[ ! "${ENVIRONMENT}" =~ ^(dev|staging|prod)$ ]]; then
-        log_error "Invalid environment: ${ENVIRONMENT}. Must be dev, staging, or prod."
+    if [[ "${ENVIRONMENT}" != "cicd" && ! "${ENVIRONMENT}" =~ ^(dev|staging|prod)$ ]]; then
+        log_error "Invalid environment: ${ENVIRONMENT}. Must be dev, staging, prod, or use --type github-actions."
         exit 1
     fi
 
@@ -319,59 +320,103 @@ sync_common_secrets() {
 }
 
 ################################################################################
-# CI/CD Secrets
+# CI/CD Secrets (GitHub Actions)
 ################################################################################
 
 sync_cicd_secrets() {
-    log_info "Syncing CI/CD secrets..."
+    log_info "Syncing CI/CD secrets for GitHub Actions..."
 
     local dockerhub_username
     local dockerhub_password
     local sonarqube_token
-    local gitops_deploy_key
+    local sonarqube_url
+    local gitops_private_key
+    local gitops_public_key
     local slack_webhook_url
+    local slack_channel
+    local nexus_username
+    local nexus_password
+    local nexus_url
 
     if [[ "${INTERACTIVE}" == "true" ]]; then
         dockerhub_username=$(prompt_for_secret "Enter DockerHub username" "${DOCKERHUB_USERNAME:-}")
-        dockerhub_password=$(prompt_for_secret "Enter DockerHub password" "${DOCKERHUB_PASSWORD:-}")
+        dockerhub_password=$(prompt_for_secret "Enter DockerHub access token" "${DOCKERHUB_ACCESS_TOKEN:-}")
         sonarqube_token=$(prompt_for_secret "Enter SonarQube token" "${SONARQUBE_TOKEN:-}")
-        gitops_deploy_key=$(prompt_for_secret "Enter GitOps deploy key" "${GITOPS_DEPLOY_KEY:-}")
+        sonarqube_url=$(prompt_for_secret "Enter SonarQube URL" "${SONARQUBE_URL:-}")
+        gitops_private_key=$(prompt_for_secret "Enter GitOps deploy private key" "${GITOPS_PRIVATE_KEY:-}")
+        gitops_public_key=$(prompt_for_secret "Enter GitOps deploy public key" "${GITOPS_PUBLIC_KEY:-}")
         slack_webhook_url=$(prompt_for_secret "Enter Slack webhook URL" "${SLACK_WEBHOOK_URL:-}")
+        slack_channel=$(prompt_for_secret "Enter Slack channel" "${SLACK_CHANNEL:-#ci-cd}")
+        nexus_username=$(prompt_for_secret "Enter Nexus username (optional)" "${NEXUS_USERNAME:-}")
+        nexus_password=$(prompt_for_secret "Enter Nexus password (optional)" "${NEXUS_PASSWORD:-}")
+        nexus_url=$(prompt_for_secret "Enter Nexus URL (optional)" "${NEXUS_URL:-}")
     else
         dockerhub_username="${DOCKERHUB_USERNAME:-}"
-        dockerhub_password="${DOCKERHUB_PASSWORD:-}"
+        dockerhub_password="${DOCKERHUB_ACCESS_TOKEN:-}"
         sonarqube_token="${SONARQUBE_TOKEN:-}"
-        gitops_deploy_key="${GITOPS_DEPLOY_KEY:-}"
+        sonarqube_url="${SONARQUBE_URL:-}"
+        gitops_private_key="${GITOPS_PRIVATE_KEY:-}"
+        gitops_public_key="${GITOPS_PUBLIC_KEY:-}"
         slack_webhook_url="${SLACK_WEBHOOK_URL:-}"
+        slack_channel="${SLACK_CHANNEL:-#ci-cd}"
+        nexus_username="${NEXUS_USERNAME:-}"
+        nexus_password="${NEXUS_PASSWORD:-}"
+        nexus_url="${NEXUS_URL:-}"
     fi
 
+    # DockerHub credentials
     if [[ -n "${dockerhub_username}" && -n "${dockerhub_password}" ]]; then
         sync_secret "secret/github-actions/dockerhub-credentials" \
             "username=${dockerhub_username}" \
-            "password=${dockerhub_password}"
+            "password=${dockerhub_password}" \
+            "registry=docker.io"
+        log_success "DockerHub credentials synced"
     else
-        log_warning "Skipping DockerHub credentials (not provided)"
+        log_warning "Skipping DockerHub credentials (username and access token required)"
     fi
 
-    if [[ -n "${sonarqube_token}" ]]; then
+    # SonarQube token
+    if [[ -n "${sonarqube_token}" && -n "${sonarqube_url}" ]]; then
         sync_secret "secret/github-actions/sonarqube-token" \
-            "token=${sonarqube_token}"
+            "token=${sonarqube_token}" \
+            "url=${sonarqube_url}" \
+            "organization=craftista"
+        log_success "SonarQube token synced"
     else
-        log_warning "Skipping SonarQube token (not provided)"
+        log_warning "Skipping SonarQube token (token and URL required)"
     fi
 
-    if [[ -n "${gitops_deploy_key}" ]]; then
+    # GitOps deploy key
+    if [[ -n "${gitops_private_key}" && -n "${gitops_public_key}" ]]; then
         sync_secret "secret/github-actions/gitops-deploy-key" \
-            "private_key=${gitops_deploy_key}"
+            "private_key=${gitops_private_key}" \
+            "public_key=${gitops_public_key}" \
+            "repository=charliepoker/craftista-gitops"
+        log_success "GitOps deploy key synced"
     else
-        log_warning "Skipping GitOps deploy key (not provided)"
+        log_warning "Skipping GitOps deploy key (private and public key required)"
     fi
 
+    # Slack webhook
     if [[ -n "${slack_webhook_url}" ]]; then
         sync_secret "secret/github-actions/slack-webhook-url" \
-            "url=${slack_webhook_url}"
+            "webhook_url=${slack_webhook_url}" \
+            "channel=${slack_channel}" \
+            "username=GitHub Actions"
+        log_success "Slack webhook URL synced"
     else
-        log_warning "Skipping Slack webhook URL (not provided)"
+        log_warning "Skipping Slack webhook URL (webhook URL required)"
+    fi
+
+    # Nexus credentials (optional)
+    if [[ -n "${nexus_username}" && -n "${nexus_password}" && -n "${nexus_url}" ]]; then
+        sync_secret "secret/github-actions/nexus-credentials" \
+            "username=${nexus_username}" \
+            "password=${nexus_password}" \
+            "url=${nexus_url}"
+        log_success "Nexus credentials synced"
+    else
+        log_info "Skipping Nexus credentials (optional - not all values provided)"
     fi
 }
 
@@ -389,6 +434,13 @@ main() {
                 ;;
             --service)
                 SERVICE="$2"
+                shift 2
+                ;;
+            --type)
+                if [[ "$2" == "github-actions" ]]; then
+                    SERVICE="github-actions"
+                    ENVIRONMENT="cicd"  # Special environment for CI/CD secrets
+                fi
                 shift 2
                 ;;
             --vault-addr)
@@ -434,30 +486,35 @@ main() {
     # Check prerequisites
     check_prerequisites
 
-    # Sync secrets based on service filter
-    if [[ -z "${SERVICE}" || "${SERVICE}" == "frontend" ]]; then
-        sync_frontend_secrets
-    fi
-
-    if [[ -z "${SERVICE}" || "${SERVICE}" == "catalogue" ]]; then
-        sync_catalogue_secrets
-    fi
-
-    if [[ -z "${SERVICE}" || "${SERVICE}" == "voting" ]]; then
-        sync_voting_secrets
-    fi
-
-    if [[ -z "${SERVICE}" || "${SERVICE}" == "recommendation" ]]; then
-        sync_recommendation_secrets
-    fi
-
-    if [[ -z "${SERVICE}" ]]; then
-        sync_common_secrets
-    fi
-
-    # Sync CI/CD secrets (only if no specific service is specified)
-    if [[ -z "${SERVICE}" && "${ENVIRONMENT}" == "dev" ]]; then
+    # Handle GitHub Actions secrets specifically
+    if [[ "${SERVICE}" == "github-actions" ]]; then
         sync_cicd_secrets
+    else
+        # Sync application secrets based on service filter
+        if [[ -z "${SERVICE}" || "${SERVICE}" == "frontend" ]]; then
+            sync_frontend_secrets
+        fi
+
+        if [[ -z "${SERVICE}" || "${SERVICE}" == "catalogue" ]]; then
+            sync_catalogue_secrets
+        fi
+
+        if [[ -z "${SERVICE}" || "${SERVICE}" == "voting" ]]; then
+            sync_voting_secrets
+        fi
+
+        if [[ -z "${SERVICE}" || "${SERVICE}" == "recommendation" ]]; then
+            sync_recommendation_secrets
+        fi
+
+        if [[ -z "${SERVICE}" ]]; then
+            sync_common_secrets
+        fi
+
+        # Sync CI/CD secrets (only if no specific service is specified and in dev environment)
+        if [[ -z "${SERVICE}" && "${ENVIRONMENT}" == "dev" ]]; then
+            sync_cicd_secrets
+        fi
     fi
 
     log_success "Secrets sync completed successfully!"

@@ -48,11 +48,11 @@ secret/
 │       └── [same structure as dev]
 │
 ├── github-actions/
-│   ├── dockerhub-credentials
-│   ├── sonarqube-token
-│   ├── gitops-deploy-key
-│   ├── slack-webhook-url
-│   └── nexus-credentials
+│   ├── dockerhub-credentials    # DockerHub registry credentials
+│   ├── sonarqube-token         # SonarQube authentication token
+│   ├── gitops-deploy-key       # SSH key for pushing to craftista-gitops repo
+│   ├── slack-webhook-url       # Slack webhook for CI/CD notifications
+│   └── nexus-credentials       # Nexus repository credentials (optional)
 │
 └── argocd/
     ├── admin-password
@@ -98,11 +98,15 @@ secret/
 
 ### CI/CD Secrets (GitHub Actions)
 
-- **dockerhub-credentials**: Username and password for pushing images
-- **sonarqube-token**: Authentication token for SonarQube
-- **gitops-deploy-key**: SSH key for pushing to gitops repository
-- **slack-webhook-url**: Webhook URL for CI/CD notifications
-- **nexus-credentials**: Username and password for Nexus repository
+GitHub Actions CI/CD secrets are stored separately from application secrets and are documented in detail in the `github-actions/` directory.
+
+- **dockerhub-credentials**: Username and access token for pushing Docker images to DockerHub
+- **sonarqube-token**: Authentication token and URL for SonarQube code quality analysis
+- **gitops-deploy-key**: SSH private/public key pair for pushing image tag updates to craftista-gitops repository
+- **slack-webhook-url**: Webhook URL and channel for sending CI/CD notifications to Slack
+- **nexus-credentials**: Username, password, and URL for Nexus repository (optional)
+
+See `vault/secrets/github-actions/README.md` for detailed setup instructions.
 
 ### ArgoCD Secrets
 
@@ -146,14 +150,33 @@ vault kv put secret/craftista/dev/catalogue/mongodb-uri \
 # Navigate to scripts directory
 cd scripts/
 
-# Run the sync-secrets script
-./sync-secrets.sh --environment dev --secrets-file ../vault/secrets/dev/secrets-template.yaml
+# Sync application secrets for an environment
+./sync-secrets.sh --environment dev --interactive
+
+# Sync GitHub Actions CI/CD secrets
+./sync-secrets.sh --type github-actions --from-env
 
 # For production (requires additional confirmation)
-./sync-secrets.sh --environment prod --secrets-file ../vault/secrets/prod/secrets-template.yaml
+./sync-secrets.sh --environment prod --interactive
 ```
 
-### Method 3: Using Vault UI
+### Method 3: Using GitHub Actions Setup Script
+
+```bash
+# Navigate to scripts directory
+cd scripts/
+
+# Interactive setup for GitHub Actions secrets
+./setup-github-actions-secrets.sh --interactive
+
+# From environment variables
+./setup-github-actions-secrets.sh --from-env
+
+# Dry run to see what would be done
+./setup-github-actions-secrets.sh --from-env --dry-run
+```
+
+### Method 4: Using Vault UI
 
 1. Navigate to Vault UI at `https://vault.example.com`
 2. Log in with your token
