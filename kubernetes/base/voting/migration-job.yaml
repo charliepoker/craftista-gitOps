@@ -19,7 +19,6 @@ spec:
         component: migration
     spec:
       restartPolicy: Never
-      serviceAccountName: voting
       containers:
         - name: flyway-migration
           image: 8060633493/craftista-voting:latest
