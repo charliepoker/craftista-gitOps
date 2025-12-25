@@ -22,7 +22,7 @@ spec:
       serviceAccountName: voting
       containers:
         - name: voting
-          image: 8060633493/craftista-voting:latest
+          image: 8060633493/craftista-voting:v1.0.0
           ports:
             - containerPort: 8080
               name: http
