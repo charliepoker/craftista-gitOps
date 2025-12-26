@@ -20,6 +20,7 @@ kustomization.yaml.bak
 !*secret*-template.yaml
 !*secrets*-template.yaml
 !external-secrets/
+.secrets/
 
 # Terraform state (if any)
 *.tfstate

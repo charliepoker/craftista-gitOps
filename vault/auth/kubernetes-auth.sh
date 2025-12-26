@@ -1,120 +1,174 @@
 #!/bin/bash
-# Script to configure Kubernetes authentication method in Vault
-# This enables Kubernetes service accounts to authenticate with Vault
+# Configure Kubernetes authentication method in Vault
+# Works both locally and in-cluster
 
-set -e
+set -euo pipefail
 
-# Configuration variables
+########################
+# Configuration
+########################
 VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
 VAULT_TOKEN="${VAULT_TOKEN:-}"
 K8S_HOST="${K8S_HOST:-https://kubernetes.default.svc}"
-K8S_CA_CERT="${K8S_CA_CERT:-/var/run/secrets/kubernetes.io/serviceaccount/ca.crt}"
+K8S_NAMESPACE="${K8S_NAMESPACE:-vault}"
+TOKEN_REVIEWER_SA="${TOKEN_REVIEWER_SA:-vault-token-reviewer}"
 TOKEN_REVIEWER_JWT="${TOKEN_REVIEWER_JWT:-}"
 
-# Color codes for output
+K8S_CA_CERT="${K8S_CA_CERT:-/var/run/secrets/kubernetes.io/serviceaccount/ca.crt}"
+
+########################
+# Colors
+########################
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-echo -e "${GREEN}=== Configuring Kubernetes Authentication in Vault ===${NC}"
-
-# Check if Vault token is set
-if [ -z "$VAULT_TOKEN" ]; then
-  echo -e "${RED}Error: VAULT_TOKEN environment variable is not set${NC}"
-  echo "Please set VAULT_TOKEN with a token that has admin privileges"
+########################
+# Helpers
+########################
+die() {
+  echo -e "${RED}ERROR:${NC} $1"
   exit 1
-fi
+}
 
-# Export Vault address for CLI commands
-export VAULT_ADDR
+info() {
+  echo -e "${YELLOW}$1${NC}"
+}
 
-# Check Vault connectivity
-echo -e "${YELLOW}Checking Vault connectivity...${NC}"
-if ! vault status > /dev/null 2>&1; then
-  echo -e "${RED}Error: Cannot connect to Vault at $VAULT_ADDR${NC}"
-  exit 1
-fi
-echo -e "${GREEN}✓ Vault is accessible${NC}"
+ok() {
+  echo -e "${GREEN}✓ $1${NC}"
+}
 
-# Enable Kubernetes auth method if not already enabled
-echo -e "${YELLOW}Enabling Kubernetes auth method...${NC}"
-if vault auth list | grep -q "kubernetes/"; then
-  echo -e "${YELLOW}Kubernetes auth method already enabled${NC}"
+########################
+# Preconditions
+########################
+command -v vault >/dev/null || die "vault CLI not found"
+command -v kubectl >/dev/null || die "kubectl not found"
+
+[ -z "$VAULT_TOKEN" ] && die "VAULT_TOKEN must be set (use root token for bootstrap)"
+
+export VAULT_ADDR VAULT_TOKEN
+
+########################
+# Connectivity check
+########################
+info "Checking Vault connectivity..."
+vault status >/dev/null || die "Cannot connect to Vault at $VAULT_ADDR"
+ok "Vault is accessible"
+
+########################
+# Enable auth method
+########################
+info "Enabling Kubernetes auth method..."
+if vault auth list | grep -q '^kubernetes/'; then
+  ok "Kubernetes auth already enabled"
 else
   vault auth enable kubernetes
-  echo -e "${GREEN}✓ Kubernetes auth method enabled${NC}"
+  ok "Kubernetes auth enabled"
 fi
 
-# Get the token reviewer JWT if not provided
+########################
+# Ensure Token Reviewer SA
+########################
+info "Ensuring token reviewer ServiceAccount exists..."
+
+kubectl get sa "$TOKEN_REVIEWER_SA" -n "$K8S_NAMESPACE" >/dev/null 2>&1 || \
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: $TOKEN_REVIEWER_SA
+  namespace: $K8S_NAMESPACE
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: $TOKEN_REVIEWER_SA-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: $TOKEN_REVIEWER_SA
+  namespace: $K8S_NAMESPACE
+EOF
+
+ok "Token reviewer ServiceAccount ready"
+
+########################
+# Retrieve JWT
+########################
 if [ -z "$TOKEN_REVIEWER_JWT" ]; then
-  echo -e "${YELLOW}Retrieving service account token...${NC}"
-  # Try to get token from mounted service account
-  if [ -f "/var/run/secrets/kubernetes.io/serviceaccount/token" ]; then
+  info "Retrieving token reviewer JWT..."
+  
+  # Try kubectl create token first (Kubernetes ≥1.24)
+  if TOKEN_REVIEWER_JWT=$(kubectl create token "$TOKEN_REVIEWER_SA" -n "$K8S_NAMESPACE" 2>/dev/null); then
+    ok "Token reviewer JWT acquired via create token"
+  elif [ -f /var/run/secrets/kubernetes.io/serviceaccount/token ]; then
     TOKEN_REVIEWER_JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    ok "Token reviewer JWT acquired from service account"
   else
-    echo -e "${RED}Error: TOKEN_REVIEWER_JWT not provided and cannot read from service account${NC}"
-    echo "Please provide TOKEN_REVIEWER_JWT environment variable"
-    exit 1
+    die "Unable to retrieve TOKEN_REVIEWER_JWT"
   fi
 fi
 
-# Configure Kubernetes auth method
-echo -e "${YELLOW}Configuring Kubernetes auth method...${NC}"
-vault write auth/kubernetes/config \
-  token_reviewer_jwt="$TOKEN_REVIEWER_JWT" \
-  kubernetes_host="$K8S_HOST" \
-  kubernetes_ca_cert=@"$K8S_CA_CERT" \
-  disable_local_ca_jwt=false
+[ -z "$TOKEN_REVIEWER_JWT" ] && die "TOKEN_REVIEWER_JWT is empty"
+ok "Token reviewer JWT acquired"
 
-echo -e "${GREEN}✓ Kubernetes auth method configured${NC}"
+########################
+# Configure auth
+########################
+info "Configuring Kubernetes auth in Vault..."
 
-# Create roles for each microservice
-echo -e "${YELLOW}Creating Vault roles for microservices...${NC}"
+# Get CA certificate - try in-cluster path first, then kubectl
+if [ -f "$K8S_CA_CERT" ]; then
+  vault write auth/kubernetes/config \
+    token_reviewer_jwt="$TOKEN_REVIEWER_JWT" \
+    kubernetes_host="$K8S_HOST" \
+    kubernetes_ca_cert=@"$K8S_CA_CERT" \
+    disable_local_ca_jwt=false
+else
+  # Running locally - get CA from kubectl
+  K8S_CA_CERT_DATA=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 -d)
+  vault write auth/kubernetes/config \
+    token_reviewer_jwt="$TOKEN_REVIEWER_JWT" \
+    kubernetes_host="$(kubectl config view --minify -o jsonpath='{.clusters[].cluster.server}')" \
+    kubernetes_ca_cert="$K8S_CA_CERT_DATA" \
+    disable_local_ca_jwt=false
+fi
 
-# Frontend role
-vault write auth/kubernetes/role/frontend \
-  bound_service_account_names=frontend \
-  bound_service_account_namespaces=craftista-dev,craftista-staging,craftista-prod \
-  policies=frontend-policy \
-  ttl=24h
+ok "Kubernetes auth configured"
 
-echo -e "${GREEN}✓ Created role for frontend service${NC}"
+########################
+# Roles
+########################
+info "Creating Vault roles..."
 
-# Catalogue role
-vault write auth/kubernetes/role/catalogue \
-  bound_service_account_names=catalogue \
-  bound_service_account_namespaces=craftista-dev,craftista-staging,craftista-prod \
-  policies=catalogue-policy \
-  ttl=24h
+create_role() {
+  local name=$1
+  local policy=$2
 
-echo -e "${GREEN}✓ Created role for catalogue service${NC}"
+  vault write auth/kubernetes/role/$name \
+    bound_service_account_names=$name \
+    bound_service_account_namespaces=craftista-dev,craftista-staging,craftista-prod \
+    policies=$policy \
+    ttl=24h
 
-# Voting role
-vault write auth/kubernetes/role/voting \
-  bound_service_account_names=voting \
-  bound_service_account_namespaces=craftista-dev,craftista-staging,craftista-prod \
-  policies=voting-policy \
-  ttl=24h
+  ok "Role created: $name"
+}
 
-echo -e "${GREEN}✓ Created role for voting service${NC}"
+create_role frontend frontend-policy
+create_role catalogue catalogue-policy
+create_role voting voting-policy
+create_role recommendation recommendation-policy
 
-# Recommendation role
-vault write auth/kubernetes/role/recommendation \
-  bound_service_account_names=recommendation \
-  bound_service_account_namespaces=craftista-dev,craftista-staging,craftista-prod \
-  policies=recommendation-policy \
-  ttl=24h
-
-echo -e "${GREEN}✓ Created role for recommendation service${NC}"
-
-# Verify configuration
-echo -e "${YELLOW}Verifying Kubernetes auth configuration...${NC}"
-vault read auth/kubernetes/config
+########################
+# Verify
+########################
+info "Verifying configuration..."
+vault read auth/kubernetes/config >/dev/null
+ok "Kubernetes auth verified"
 
 echo -e "${GREEN}=== Kubernetes Authentication Configuration Complete ===${NC}"
-echo ""
-echo "Next steps:"
-echo "1. Apply Vault policies using: vault policy write <policy-name> <policy-file>"
-echo "2. Ensure service accounts exist in Kubernetes namespaces"
-echo "3. Configure pods with Vault annotations for secret injection"

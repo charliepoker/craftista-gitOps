@@ -103,6 +103,13 @@ check_prerequisites() {
         exit 1
     fi
 
+    # Check if KV secrets engine is enabled
+    if ! vault secrets list | grep -q "^secret/"; then
+        log_info "KV secrets engine not found at secret/. Enabling..."
+        vault secrets enable -path=secret kv-v2
+        log_success "KV secrets engine enabled at secret/"
+    fi
+
     # Validate environment (skip for CI/CD secrets)
     if [[ -z "${ENVIRONMENT}" ]]; then
         log_error "Environment is required. Use --environment flag or --type github-actions."
