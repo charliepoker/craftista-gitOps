@@ -10,4 +10,4 @@ spec:
     spec:
       containers:
         - name: voting
-          image: 8060633493/craftista-voting:prod-latest
+          image: 8060633493/craftista-voting:v1.0.0

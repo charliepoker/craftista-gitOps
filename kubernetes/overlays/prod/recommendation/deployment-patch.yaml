@@ -10,4 +10,4 @@ spec:
     spec:
       containers:
         - name: recommendation
-          image: 8060633493/craftista-recommendation:prod-latest
+          image: 8060633493/craftista-recommendation:v1.0.0
