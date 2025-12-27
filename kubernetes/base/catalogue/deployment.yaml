@@ -20,6 +20,8 @@ spec:
         vault.hashicorp.com/agent-inject-secret-mongodb: "secret/data/craftista/ENV/catalogue/mongodb"
     spec:
       serviceAccountName: catalogue
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
       containers:
         - name: catalogue
           image: 8060633493/craftista-catalogue:latest

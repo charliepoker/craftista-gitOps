@@ -20,6 +20,8 @@ spec:
         vault.hashicorp.com/agent-inject-secret-postgres: "secret/data/craftista/ENV/voting/postgres"
     spec:
       serviceAccountName: voting
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
       containers:
         - name: voting
           image: 8060633493/craftista-voting:v1.0.0

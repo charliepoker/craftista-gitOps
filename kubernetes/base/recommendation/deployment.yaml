@@ -20,6 +20,8 @@ spec:
         vault.hashicorp.com/agent-inject-secret-redis: "secret/data/craftista/ENV/recommendation/redis"
     spec:
       serviceAccountName: recommendation
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
       containers:
         - name: recommendation
           image: 8060633493/craftista-recommendation:latest
