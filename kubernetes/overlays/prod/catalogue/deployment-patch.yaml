@@ -10,4 +10,4 @@ spec:
     spec:
       containers:
         - name: catalogue
-          image: 8060633493/craftista-catalogue:v1.0.0
+          image: 8060633493/craftista-catalogue:latest
