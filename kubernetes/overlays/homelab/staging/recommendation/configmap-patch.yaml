@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recommendation-config
+data:
+  REDIS_DB: "0"
+  LOG_LEVEL: "INFO"
+  GIN_MODE: "release"

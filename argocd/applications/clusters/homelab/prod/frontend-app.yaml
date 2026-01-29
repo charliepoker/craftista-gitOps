@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: craftista-frontend-prod
+  namespace: argocd
+  labels:
+    app: frontend
+    environment: prod
+    component: web
+spec:
+  # Project reference
+  project: craftista-prod
+
+  # Source configuration
+  source:
+    repoURL: https://github.com/charliepoker/craftista-gitops.git
+    targetRevision: main
+    path: kubernetes/overlays/prod/frontend
+
+  # Destination configuration
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: craftista-prod
+
+  # Sync policy configuration - MANUAL SYNC FOR PRODUCTION
+  syncPolicy:
+    # No automated sync for production - requires manual approval
+    syncOptions:
+      - CreateNamespace=true # Automatically create namespace if it doesn't exist
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignore differences for fields that are expected to change
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas # Ignore replica count changes (managed by HPA)

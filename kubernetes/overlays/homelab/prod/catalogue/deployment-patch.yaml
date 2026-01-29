@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue
+spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/prod/catalogue/config"
+    spec:
+      containers:
+        - name: catalogue
+          image: 8060633493/craftista-catalogue:latest

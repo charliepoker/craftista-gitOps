@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: recommendation
+spec:
+  tls:
+    - hosts:
+        - recommendation.dev.webdemoapp.com
+      secretName: recommendation-dev-tls
+  rules:
+    - host: recommendation.dev.webdemoapp.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: recommendation
+                port:
+                  number: 8080

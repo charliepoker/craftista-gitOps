@@ -19,7 +19,7 @@ kustomization.yaml.bak
 *secrets*.yaml
 !*secret*-template.yaml
 !*secrets*-template.yaml
-!external-secrets/
+!external-secrets/**
 .secrets/
 
 # Terraform state (if any)
@@ -69,3 +69,4 @@ vault-token
 # Backup files
 *.bak
 *.backup
+DEPLOYMENT_GUIDE.md

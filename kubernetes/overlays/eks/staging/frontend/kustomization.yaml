@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: craftista-staging
+
+resources:
+  - ../../../../base/frontend
+
+commonLabels:
+  environment: staging
+
+patches:
+  - path: deployment-patch.yaml
+    target:
+      kind: Deployment
+      name: frontend
+  - path: resources-patch.yaml
+    target:
+      kind: Deployment
+      name: frontend
+  - path: configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: frontend-config
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: frontend
+
+replicas:
+  - name: frontend
+    count: 2

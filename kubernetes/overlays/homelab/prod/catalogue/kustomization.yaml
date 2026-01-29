@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: craftista-prod
+
+resources:
+  - ../../../../base/catalogue
+
+commonLabels:
+  environment: prod
+
+patches:
+  - path: deployment-patch.yaml
+    target:
+      kind: Deployment
+      name: catalogue
+  - path: resources-patch.yaml
+    target:
+      kind: Deployment
+      name: catalogue
+  - path: configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: catalogue-config
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: catalogue
+
+replicas:
+  - name: catalogue
+    count: 3
