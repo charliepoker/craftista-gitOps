@@ -58,9 +58,13 @@ temp/
 # ArgoCD local config
 argocd-local-config/
 
-# Vault tokens (never commit)
+# Vault tokens and keys (never commit)
 .vault-token
 vault-token
+ca-key
+vault-key.pem
+*.key
+*.pem
 
 # Environment-specific overrides (use templates instead)
 *-override.yaml
