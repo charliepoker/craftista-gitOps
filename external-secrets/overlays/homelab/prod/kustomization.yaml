@@ -11,6 +11,11 @@ resources:
   - voting-secrets.yaml
   - dockerhub-pull-secret.yaml
 
-commonLabels:
-  app.kubernetes.io/managed-by: argocd
-  environment: prod
+patches:
+  - path: secret-store-patch.yaml
+  
+
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: argocd
+      environment: prod
