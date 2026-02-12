@@ -74,3 +74,5 @@ vault-key.pem
 *.bak
 *.backup
 DEPLOYMENT_GUIDE.md
+04-phase-2-homelab-full-stack-step-by-step.md
+generate-vault-certs.sh

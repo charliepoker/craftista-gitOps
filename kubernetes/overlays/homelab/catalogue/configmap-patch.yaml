@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalogue-config
+data:
+  CATALOGUE_MODE: "db"
+  MONGODB_HOST: "mongodb.craftista-dev.svc.cluster.local"
+  MONGODB_PORT: "27017"
+  MONGODB_DATABASE: "catalogue"

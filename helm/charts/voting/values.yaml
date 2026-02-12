@@ -107,7 +107,7 @@ postgresql:
 migration:
   enabled: true
   image:
-    repository: charliepoker/craftista-voting
+    repository: 8060633493/craftista-voting
     tag: "latest"
   backoffLimit: 3
   activeDeadlineSeconds: 600

@@ -297,7 +297,7 @@ replicas:
     count: 1
 
 images:
-  - name: charliepoker/craftista-frontend
+  - name: 8060633493/craftista-frontend
     newTag: latest
 ```
 

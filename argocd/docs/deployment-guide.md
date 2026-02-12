@@ -415,7 +415,7 @@ Image tags are automatically updated by the CI/CD pipeline in the [craftista](ht
     cd craftista-gitops
 
     # Update image tag in appropriate overlay
-    sed -i "s|image: .*/craftista-frontend:.*|image: charliepoker/craftista-frontend:${GITHUB_SHA}|" \
+    sed -i "s|image: .*/craftista-frontend:.*|image: 8060633493/craftista-frontend:${GITHUB_SHA}|" \
       kubernetes/overlays/${ENVIRONMENT}/frontend/kustomization.yaml
 
     # Commit and push changes
@@ -434,7 +434,7 @@ vim kubernetes/overlays/dev/frontend/kustomization.yaml
 
 # Update the image tag
 images:
-  - name: charliepoker/craftista-frontend
+  - name: 8060633493/craftista-frontend
     newTag: "v1.2.3"
 
 # Commit changes

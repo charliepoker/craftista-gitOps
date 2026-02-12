@@ -1270,10 +1270,10 @@ kubectl auth can-i --list --as=system:serviceaccount:craftista-prod:frontend
 
 ```bash
 # Scan container images
-trivy image charliepoker/craftista-frontend:latest
-trivy image charliepoker/craftista-catalogue:latest
-trivy image charliepoker/craftista-voting:latest
-trivy image charliepoker/craftista-recommendation:latest
+trivy image 8060633493/craftista-frontend:latest
+trivy image 8060633493/craftista-catalogue:latest
+trivy image 8060633493/craftista-voting:latest
+trivy image 8060633493/craftista-recommendation:latest
 
 # Scan Kubernetes configurations
 trivy config kubernetes/

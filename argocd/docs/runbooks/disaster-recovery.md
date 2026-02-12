@@ -378,10 +378,10 @@ aws s3 cp argocd-apps-$(date +%Y%m%d).yaml s3://craftista-disaster-recovery/argo
 
    ```bash
    # Check if images are available in DockerHub
-   docker pull charliepoker/craftista-frontend:latest
-   docker pull charliepoker/craftista-catalogue:latest
-   docker pull charliepoker/craftista-voting:latest
-   docker pull charliepoker/craftista-recommendation:latest
+   docker pull 8060633493/craftista-frontend:latest
+   docker pull 8060633493/craftista-catalogue:latest
+   docker pull 8060633493/craftista-voting:latest
+   docker pull 8060633493/craftista-recommendation:latest
    ```
 
 2. **Rebuild Images if Necessary**:
@@ -392,8 +392,8 @@ aws s3 cp argocd-apps-$(date +%Y%m%d).yaml s3://craftista-disaster-recovery/argo
    cd craftista
 
    # Build and push images
-   docker build -t charliepoker/craftista-frontend:recovery ./frontend/
-   docker push charliepoker/craftista-frontend:recovery
+   docker build -t 8060633493/craftista-frontend:recovery ./frontend/
+   docker push 8060633493/craftista-frontend:recovery
 
    # Update GitOps repo with recovery tags
    sed -i 's/:latest/:recovery/g' kubernetes/overlays/prod/*/kustomization.yaml

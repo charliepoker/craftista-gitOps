@@ -261,7 +261,7 @@ kubectl get pod <pod-name> -n craftista-prod -o yaml | grep -A 10 "livenessProbe
 
    ```bash
    # Verify image in registry
-   docker pull charliepoker/craftista-frontend:latest
+   docker pull 8060633493/craftista-frontend:latest
 
    # Check image tag in deployment
    kubectl get deployment frontend -n craftista-prod -o yaml | grep image:
@@ -632,7 +632,7 @@ kubectl exec -it deployment/frontend -n craftista-prod -- curl http://localhost:
    curl -u $SONARQUBE_TOKEN: https://sonarqube.webdemoapp.com/api/system/status
 
    # Check Trivy scan results
-   trivy image charliepoker/craftista-frontend:latest
+   trivy image 8060633493/craftista-frontend:latest
    ```
 
 3. **GitOps Update Failures**:
