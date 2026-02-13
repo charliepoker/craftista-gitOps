@@ -9,7 +9,7 @@ metadata:
     component: web
 spec:
   # Project reference
-  project: craftista-prod
+  project: craftista-eks
 
   # Source configuration
   source:

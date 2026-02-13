@@ -9,7 +9,7 @@ metadata:
     component: api
 spec:
   # Project reference
-  project: craftista-dev
+  project: craftista-eks
 
   # Source configuration
   source:

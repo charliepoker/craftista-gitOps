@@ -1,19 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: craftista-prod
+  name: craftista-eks
   namespace: argocd
   labels:
-    environment: prod
+    cluster: eks
 spec:
-  description: Craftista Production Environment
+  description: Craftista application stack — AWS EKS cluster (all environments)
 
   # Source repositories that applications in this project can deploy from
   sourceRepos:
     - https://github.com/charliepoker/craftista-gitops.git
 
-  # Destinations where applications can be deployed
+  # Destinations where applications can be deployed (all craftista namespaces)
+  # Update the server URL when your EKS cluster is provisioned
   destinations:
+    - namespace: craftista-dev
+      server: https://kubernetes.default.svc
+    - namespace: craftista-staging
+      server: https://kubernetes.default.svc
     - namespace: craftista-prod
       server: https://kubernetes.default.svc
 
