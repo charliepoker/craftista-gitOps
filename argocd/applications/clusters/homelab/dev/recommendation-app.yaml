@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://github.com/charliepoker/craftista-gitops.git
     targetRevision: main
-    path: kubernetes/overlays/dev/recommendation
+    path: kubernetes/overlays/homelab/recommendation
 
   # Destination configuration
   destination:
