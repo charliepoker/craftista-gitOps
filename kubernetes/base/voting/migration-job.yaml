@@ -31,10 +31,7 @@ spec:
               echo "Migration completed successfully"
           env:
             - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: voting-config
-                  key: SPRING_PROFILES_ACTIVE
+              value: "production"
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
