@@ -5,15 +5,16 @@ metadata:
   labels:
     app: frontend
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
-        - frontend.DOMAIN_PLACEHOLDER
+        - frontend.home-lab.webdemoapp.com
       secretName: frontend-tls
   rules:
-    - host: frontend.DOMAIN_PLACEHOLDER
+    - host: frontend.home-lab.webdemoapp.com
       http:
         paths:
           - path: /

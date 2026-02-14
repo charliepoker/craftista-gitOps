@@ -3,9 +3,6 @@ kind: Kustomization
 namespace: craftista-dev
 resources:
   - ../../../base/voting
-patches:
-  - path: configmap-patch.yaml
-  - path: ingress-patch.yaml
 images:
   - name: 8060633493/craftista-voting
     newTag: postgres

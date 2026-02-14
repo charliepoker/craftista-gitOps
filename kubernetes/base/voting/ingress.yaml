@@ -5,21 +5,22 @@ metadata:
   labels:
     app: voting
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
-        - voting.DOMAIN_PLACEHOLDER
+        - voting.home-lab.webdemoapp.com
       secretName: voting-tls
   rules:
-    - host: voting.DOMAIN_PLACEHOLDER
+    - host: voting.home-lab.webdemoapp.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: voting
+                name: craftista-voting
                 port:
                   number: 8080

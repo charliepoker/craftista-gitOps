@@ -9,4 +9,7 @@ data:
   FLASK_DEBUG: "False"
   DATA_SOURCE: "mongodb"
   LOG_LEVEL: "INFO"
+  CATALOGUE_MODE: "db"
+  MONGODB_HOST: "mongodb.craftista-dev.svc.cluster.local"
+  MONGODB_PORT: "27017"
   MONGODB_DATABASE: "catalogue"

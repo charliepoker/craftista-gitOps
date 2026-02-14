@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: voting-config
-data:
-  CATALOGUE_SERVICEURL: "http://catalogue:5000/api/products"

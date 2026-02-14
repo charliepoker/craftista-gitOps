@@ -5,6 +5,8 @@ metadata:
   labels:
     app: recommendation
 data:
+  REDIS_HOST: "redis.craftista-dev.svc.cluster.local"
+  REDIS_PORT: "6379"
   REDIS_DB: "0"
   LOG_LEVEL: "INFO"
   GIN_MODE: "release"

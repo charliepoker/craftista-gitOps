@@ -5,15 +5,16 @@ metadata:
   labels:
     app: catalogue
   annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
-        - catalogue.DOMAIN_PLACEHOLDER
+        - catalogue.home-lab.webdemoapp.com
       secretName: catalogue-tls
   rules:
-    - host: catalogue.DOMAIN_PLACEHOLDER
+    - host: catalogue.home-lab.webdemoapp.com
       http:
         paths:
           - path: /

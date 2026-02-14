@@ -9,4 +9,5 @@ data:
   DATABASE_MAX_CONNECTIONS: "10"
   LOG_LEVEL: "INFO"
   CATALOGUE_SERVICE_URL: "http://catalogue:5000/api/products"
+  CATALOGUE_SERVICEURL: "http://catalogue:5000/api/products"
   APP_VERSION: "1.0.0"
