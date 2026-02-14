@@ -42,4 +42,10 @@ spec:
     - group: apps
       kind: Deployment
       jsonPointers:
-        - /spec/replicas # Ignore replica count changes (managed by HPA)
+        - /spec/replicas
+        - /metadata/annotations
+        - /metadata/generation
+        - /metadata/resourceVersion
+        - /spec/progressDeadlineSeconds
+        - /spec/revisionHistoryLimit
+        - /spec/strategy
