@@ -3,5 +3,4 @@ kind: ConfigMap
 metadata:
   name: voting-config
 data:
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres.craftista-dev.svc.cluster.local:5432/voting"
   CATALOGUE_SERVICEURL: "http://catalogue:5000/api/products"
