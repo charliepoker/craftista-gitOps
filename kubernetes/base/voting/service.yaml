@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: voting
+  name: craftista-voting
   labels:
     app: voting
     component: api
