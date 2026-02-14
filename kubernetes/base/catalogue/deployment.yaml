@@ -55,6 +55,11 @@ spec:
                 secretKeyRef:
                   name: catalogue-mongodb-secret
                   key: uri
+            - name: MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: catalogue-mongodb-secret
+                  key: uri
             - name: MONGODB_DATABASE
               valueFrom:
                 configMapKeyRef:

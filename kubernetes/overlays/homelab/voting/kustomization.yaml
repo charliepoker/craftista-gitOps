@@ -8,7 +8,7 @@ patches:
   - path: ingress-patch.yaml
 images:
   - name: 8060633493/craftista-voting
-    newTag: latest
+    newTag: postgres
 replicas:
   - name: voting
     count: 1
