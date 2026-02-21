@@ -30,3 +30,7 @@ patches:
 replicas:
   - name: recommendation
     count: 1
+
+images:
+  - name: 8060633493/craftista-recommendation
+    newTag: develop-1060d4d5a1c92c51976dfdb2b7fa52b4d2eb66c9
