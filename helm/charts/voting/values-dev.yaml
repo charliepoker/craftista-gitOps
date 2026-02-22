@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  tag: "develop-6f8b00690d4a41b11d9ed4501a6e1fdc737bf5ea"
+  tag: "develop-56c29236784cb42352dc0d88eb9f8460fb02d9ae"
 
 ingress:
   hosts:
@@ -50,7 +50,7 @@ postgresql:
 migration:
   enabled: true
   image:
-    tag: "develop-6f8b00690d4a41b11d9ed4501a6e1fdc737bf5ea"
+    tag: "develop-56c29236784cb42352dc0d88eb9f8460fb02d9ae"
 
 vault:
   enabled: true
