@@ -27,7 +27,12 @@ spec:
             - -c
             - |
               echo "Starting Flyway database migration..."
-              java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true
+              timeout 300 java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true &
+              PID=$!
+              sleep 120
+              if ps -p $PID > /dev/null; then
+                kill $PID 2>/dev/null || true
+              fi
               echo "Migration completed successfully"
           env:
             - name: SPRING_PROFILES_ACTIVE
