@@ -27,12 +27,17 @@ spec:
             - -c
             - |
               echo "Starting Flyway database migration..."
-              (java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true > /tmp/migration.log 2>&1) &
-              sleep 90
+              java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher
               echo "Migration completed successfully"
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "production"
+              value: "migration"
+            - name: SPRING_MAIN_WEB_APPLICATION_TYPE
+              value: "none"
+            - name: SPRING_FLYWAY_ENABLED
+              value: "true"
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              value: "org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration"
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 secretKeyRef:
