@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  tag: "dev-latest"
+  tag: "develop-0ff4666393fbb64fe51557ac1767aaffbf472007"
 
 ingress:
   hosts:
