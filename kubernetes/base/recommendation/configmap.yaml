@@ -5,7 +5,8 @@ metadata:
   labels:
     app: recommendation
 data:
-  REDIS_HOST: "redis.craftista-dev.svc.cluster.local"
+  # Use the in-namespace Service DNS name (works for dev/staging/prod)
+  REDIS_HOST: "redis"
   REDIS_PORT: "6379"
   REDIS_DB: "0"
   LOG_LEVEL: "INFO"

@@ -30,3 +30,7 @@ patches:
 replicas:
   - name: catalogue
     count: 2
+
+images:
+  - name: 8060633493/craftista-catalogue
+    newTag: develop-a911a8cb2698b5817d6395cab388bc271d1b9693

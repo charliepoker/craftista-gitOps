@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://github.com/charliepoker/craftista-gitops.git
     targetRevision: main
-    path: kubernetes/overlays/staging/voting
+    path: kubernetes/overlays/eks/staging/voting
 
   # Destination configuration
   destination:

@@ -10,6 +10,7 @@ data:
   DATA_SOURCE: "mongodb"
   LOG_LEVEL: "INFO"
   CATALOGUE_MODE: "db"
-  MONGODB_HOST: "mongodb.craftista-dev.svc.cluster.local"
+  # Use the in-namespace Service DNS name (works for dev/staging/prod)
+  MONGODB_HOST: "mongodb"
   MONGODB_PORT: "27017"
   MONGODB_DATABASE: "catalogue"

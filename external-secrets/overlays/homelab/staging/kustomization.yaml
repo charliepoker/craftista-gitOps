@@ -6,9 +6,15 @@ namespace: craftista-staging
 resources:
   - ../../../base
   - catalogue-secrets.yaml
+  - catalogue-mongodb-secret.yaml
   - frontend-secrets.yaml
   - recommendation-secrets.yaml
+  - recommendation-redis-secret.yaml
   - voting-secrets.yaml
+  - voting-postgres-secret.yaml
+  - mongodb-secrets.yaml
+  - postgres-secrets.yaml
+  - redis-secrets.yaml
   - dockerhub-pull-secret.yaml
 
 patches:
@@ -19,3 +25,4 @@ labels:
   - pairs:
       app.kubernetes.io/managed-by: argocd
       environment: staging
+
