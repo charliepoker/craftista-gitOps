@@ -32,6 +32,8 @@ replicas:
     count: 1
 
 images:
+  - name: 8060633493/craftista-frontend
+    newTag: develop-589912414e58cdd4a124215c362c24d391953dd0
 raftista-frontend/,/newTag:/ s/newTag:.*/newTag: develop-649e38497ad1027dc1286974bada429d8b56498b/
     newTag: develop-42c8c02bb0db5053d4cd27bcd7f51de960f75780
 raftista-frontend/,/newTag:/ s/newTag:.*/newTag: develop-00ba97a7aa7abc7e39d52a960a89e82f3aa3cec3/

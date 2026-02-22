@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  tag: "develop-649e38497ad1027dc1286974bada429d8b56498b"
+  tag: "develop-589912414e58cdd4a124215c362c24d391953dd0"
 
 ingress:
   hosts:
