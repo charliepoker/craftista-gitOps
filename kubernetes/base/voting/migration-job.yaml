@@ -27,10 +27,9 @@ spec:
             - -c
             - |
               echo "Starting Flyway database migration..."
-              java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true > /tmp/migration.log 2>&1 &
+              (java -cp /app/voting.jar org.springframework.boot.loader.JarLauncher --spring.flyway.enabled=true > /tmp/migration.log 2>&1) &
               sleep 90
               echo "Migration completed successfully"
-              exit 0
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "production"
