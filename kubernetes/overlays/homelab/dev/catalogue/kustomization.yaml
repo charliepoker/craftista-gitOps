@@ -32,5 +32,5 @@ replicas:
     count: 1
 
 images:
-  - name: 8060633493/craftista-catalogue
+raftista-catalogue/,/newTag:/ s/newTag:.*/newTag: develop-79620eb06cc56dfd7ed2c329909f1a91d88372a3/
     newTag: develop-0ff4666393fbb64fe51557ac1767aaffbf472007
