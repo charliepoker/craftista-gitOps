@@ -32,5 +32,7 @@ replicas:
     count: 1
 
 images:
+  - name: 8060633493/craftista-voting
+    newTag: develop-d70ab86775f0ef242a18b9e1ca3786d7cc31d08d
 raftista-voting/,/newTag:/ s/newTag:.*/newTag: develop-f1d1a48c846f5c03ddba7c4f52e9a14d4afcbd20/
     newTag: develop-a37fb46fc3eea2450e2c5844214b4d4e2690aa2c
