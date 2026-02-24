@@ -11,6 +11,7 @@ spec:
       containers:
         - name: voting
           image: 8060633493/craftista-voting:dev-latest
+          imagePullPolicy: Always
           readinessProbe:
             httpGet:
               path: /api/origamis
