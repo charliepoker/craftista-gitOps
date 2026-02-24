@@ -5,10 +5,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - recommendation.dev.webdemoapp.com
+        - recommendation.home-lab.webdemoapp.com
       secretName: recommendation-dev-tls
   rules:
-    - host: recommendation.dev.webdemoapp.com
+    - host: recommendation.home-lab.webdemoapp.com
       http:
         paths:
           - path: /

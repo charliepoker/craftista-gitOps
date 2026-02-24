@@ -5,10 +5,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - catalogue.dev.webdemoapp.com
+        - catalogue.home-lab.webdemoapp.com
       secretName: catalogue-dev-tls
   rules:
-    - host: catalogue.dev.webdemoapp.com
+    - host: catalogue.home-lab.webdemoapp.com
       http:
         paths:
           - path: /

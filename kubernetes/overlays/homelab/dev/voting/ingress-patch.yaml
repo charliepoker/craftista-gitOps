@@ -5,10 +5,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - voting.dev.webdemoapp.com
+        - voting.home-lab.webdemoapp.com
       secretName: voting-dev-tls
   rules:
-    - host: voting.dev.webdemoapp.com
+    - host: voting.home-lab.webdemoapp.com
       http:
         paths:
           - path: /

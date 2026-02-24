@@ -5,10 +5,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - frontend.dev.webdemoapp.com
+        - frontend.home-lab.webdemoapp.com
       secretName: frontend-dev-tls
   rules:
-    - host: frontend.dev.webdemoapp.com
+    - host: frontend.home-lab.webdemoapp.com
       http:
         paths:
           - path: /
