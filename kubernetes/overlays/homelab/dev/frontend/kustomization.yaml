@@ -33,4 +33,4 @@ replicas:
 
 images:
   - name: 8060633493/craftista-frontend
-    newTag: 20250214-055200
+    newTag: dev-latest

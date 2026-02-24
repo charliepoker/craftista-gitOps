@@ -33,4 +33,4 @@ replicas:
 
 images:
   - name: 8060633493/craftista-catalogue
-    newTag: 7e5c525c5a705dec6d6c5f9ee165c6dd58567d98
+    newTag: dev-latest

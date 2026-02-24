@@ -33,4 +33,4 @@ replicas:
 
 images:
   - name: 8060633493/craftista-voting
-    newTag: a4b154017db9700f9ad4f80961ceba207f6161c9
+    newTag: dev-latest

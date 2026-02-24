@@ -33,4 +33,4 @@ replicas:
 
 images:
   - name: 8060633493/craftista-recommendation
-    newTag: 4dc9afa55bacead72824360c42a2e80d91edc4b2
+    newTag: dev-latest
