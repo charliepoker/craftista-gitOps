@@ -12,10 +12,10 @@ spec:
         - name: voting
           image: 8060633493/craftista-voting:dev-latest
           livenessProbe:
-            initialDelaySeconds: 300
+            initialDelaySeconds: 600
             periodSeconds: 10
             failureThreshold: 6
           readinessProbe:
-            initialDelaySeconds: 300
+            initialDelaySeconds: 600
             periodSeconds: 10
             failureThreshold: 3
