@@ -11,11 +11,10 @@ spec:
       containers:
         - name: voting
           image: 8060633493/craftista-voting:dev-latest
-          livenessProbe:
-            initialDelaySeconds: 600
-            periodSeconds: 10
-            failureThreshold: 6
           readinessProbe:
+            httpGet:
+              path: /api/origamis
+              port: 8080
             initialDelaySeconds: 600
             periodSeconds: 10
             failureThreshold: 3
