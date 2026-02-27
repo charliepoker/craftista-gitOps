@@ -19,10 +19,8 @@ resources:
 
 patches:
   - path: secret-store-patch.yaml
-  
 
 labels:
   - pairs:
       app.kubernetes.io/managed-by: argocd
       environment: staging
-

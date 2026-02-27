@@ -22,7 +22,6 @@ spec:
     server: https://kubernetes.default.svc
     namespace: craftista-staging
 
-
   # Sync policy configuration
   syncPolicy:
     automated:
