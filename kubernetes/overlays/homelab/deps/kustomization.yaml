@@ -18,3 +18,24 @@ patches:
       - op: add
         path: /spec/storageClassName
         value: nfs-csi
+  - target:
+      kind: Service
+      name: mongodb
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: mongodb-dev
+  - target:
+      kind: Service
+      name: redis
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: redis-dev
+  - target:
+      kind: Service
+      name: postgres
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: postgres-dev
