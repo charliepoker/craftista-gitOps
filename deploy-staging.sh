@@ -25,6 +25,8 @@ fi
 echo -e "${GREEN}✅ Connected to Kubernetes cluster${NC}"
 echo
 
+STAGING_APPS_DIR="argocd/applications/clusters/homelab/staging"
+
 # Step 1: Create namespace if it doesn't exist
 echo "📦 Step 1: Creating namespace..."
 kubectl apply -f kubernetes/overlays/homelab/staging/namespace.yaml
@@ -32,7 +34,11 @@ echo
 
 # Step 2: Deploy dependencies (MongoDB, PostgreSQL, Redis)
 echo "🗄️  Step 2: Deploying dependencies..."
-kubectl apply -k argocd/applications/clusters/homelab/staging/ -l app=deps
+if [ ! -f "${STAGING_APPS_DIR}/deps-app.yaml" ]; then
+    echo -e "${RED}❌ Missing ${STAGING_APPS_DIR}/deps-app.yaml (cannot deploy dependencies)${NC}"
+    exit 1
+fi
+kubectl apply -f "${STAGING_APPS_DIR}/deps-app.yaml"
 echo -e "${YELLOW}⏳ Waiting for dependencies to be ready (this may take a few minutes)...${NC}"
 sleep 10
 echo
@@ -40,11 +46,11 @@ echo
 # Step 3: Deploy ArgoCD applications for staging
 echo "🎯 Step 3: Deploying ArgoCD applications..."
 
-APPS=("deps-app" "catalogue-app" "frontend-app" "voting-app" "recommendation-app")
+APPS=("bootstrap-app" "secrets-app" "catalogue-app" "frontend-app" "voting-app" "recommendation-app")
 
 for app in "${APPS[@]}"; do
     echo "  📝 Applying $app..."
-    kubectl apply -f argocd/applications/clusters/homelab/staging/$app.yaml
+    kubectl apply -f "${STAGING_APPS_DIR}/$app.yaml"
 done
 echo
 
