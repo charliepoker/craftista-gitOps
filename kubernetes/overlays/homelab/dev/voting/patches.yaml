@@ -13,6 +13,12 @@
 - op: replace
   path: /spec/template/spec/containers/0/resources/limits/memory
   value: 256Mi
+- op: replace
+  path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
+  value: 180
+- op: replace
+  path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
+  value: 180
 - op: add
   path: /spec/template/metadata/labels/environment
   value: dev
