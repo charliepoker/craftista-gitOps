@@ -3,4 +3,4 @@ kind: Rollout
 metadata:
   name: craftista-voting
 spec:
-  replicas: 2
+  replicas: 1
