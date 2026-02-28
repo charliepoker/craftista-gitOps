@@ -10,14 +10,18 @@ commonLabels:
   environment: staging
 
 patches:
-  - path: deployment-patch.yaml
+  - path: rollout-patch.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: recommendation
-  - path: resources-patch.yaml
+  - path: service-patch.yaml
     target:
-      kind: Deployment
-      name: recommendation
+      kind: Service
+      name: recco
+  - path: service-patch.yaml
+    target:
+      kind: Service
+      name: recco-canary
   - path: configmap-patch.yaml
     target:
       kind: ConfigMap
@@ -26,11 +30,3 @@ patches:
     target:
       kind: Ingress
       name: recommendation
-
-replicas:
-  - name: recommendation
-    count: 2
-
-images:
-  - name: 8060633493/craftista-recommendation
-    newTag: dev-latest

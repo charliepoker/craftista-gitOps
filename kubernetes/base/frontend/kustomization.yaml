@@ -3,8 +3,9 @@ kind: Kustomization
 
 resources:
   - serviceaccount.yaml
-  - deployment.yaml
+  - rollout.yaml
   - service.yaml
+  - service-canary.yaml
   - configmap.yaml
   - ingress.yaml
 

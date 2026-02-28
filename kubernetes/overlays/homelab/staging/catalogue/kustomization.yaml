@@ -10,11 +10,7 @@ commonLabels:
   environment: staging
 
 patches:
-  - path: rollout-patch.json
-    target:
-      kind: Rollout
-      name: catalogue
-  - path: resources-patch.json
+  - path: rollout-patch.yaml
     target:
       kind: Rollout
       name: catalogue
@@ -35,6 +31,3 @@ patches:
       kind: Ingress
       name: catalogue
 
-images:
-  - name: 8060633493/craftista-catalogue
-    newTag: dev-latest

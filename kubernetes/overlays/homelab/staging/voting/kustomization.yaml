@@ -10,14 +10,18 @@ commonLabels:
   environment: staging
 
 patches:
-  - path: deployment-patch.yaml
+  - path: rollout-patch.yaml
     target:
-      kind: Deployment
-      name: voting
-  - path: resources-patch.yaml
+      kind: Rollout
+      name: craftista-voting
+  - path: service-patch.yaml
     target:
-      kind: Deployment
-      name: voting
+      kind: Service
+      name: craftista-voting
+  - path: service-patch.yaml
+    target:
+      kind: Service
+      name: craftista-voting-canary
   - path: configmap-patch.yaml
     target:
       kind: ConfigMap
@@ -26,11 +30,3 @@ patches:
     target:
       kind: Ingress
       name: voting
-
-replicas:
-  - name: voting
-    count: 2
-
-images:
-  - name: 8060633493/craftista-voting
-    newTag: dev-latest

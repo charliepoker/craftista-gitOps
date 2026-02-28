@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: recommendation
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        environment: staging
+        managed-by: kustomize
+      annotations:
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/staging/recommendation/config"
+    spec:
+      containers:
+        - name: recommendation
+          image: 8060633493/craftista-recommendation:dev-latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
