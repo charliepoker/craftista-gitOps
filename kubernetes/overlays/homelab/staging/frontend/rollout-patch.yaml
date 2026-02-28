@@ -4,21 +4,3 @@ metadata:
   name: frontend
 spec:
   replicas: 2
-  template:
-    metadata:
-      labels:
-        environment: staging
-        managed-by: kustomize
-      annotations:
-        vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/staging/frontend/config"
-    spec:
-      containers:
-        - name: frontend
-          image: 8060633493/craftista-frontend:dev-latest
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 400m
-              memory: 512Mi

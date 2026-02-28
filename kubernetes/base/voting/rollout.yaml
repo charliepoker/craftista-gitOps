@@ -3,7 +3,7 @@ kind: Rollout
 metadata:
   name: voting
   labels:
-    app: voting
+    app: craftista-voting
     component: api
 spec:
   strategy:
@@ -24,11 +24,11 @@ spec:
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: voting
+      app: craftista-voting
   template:
     metadata:
       labels:
-        app: voting
+        app: craftista-voting
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "voting"

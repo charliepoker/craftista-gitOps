@@ -14,6 +14,10 @@ patches:
     target:
       kind: Rollout
       name: recommendation
+  - path: patches.yaml
+    target:
+      kind: Rollout
+      name: recommendation
   - path: service-patch.yaml
     target:
       kind: Service

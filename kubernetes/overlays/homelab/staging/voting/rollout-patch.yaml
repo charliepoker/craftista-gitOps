@@ -4,21 +4,3 @@ metadata:
   name: craftista-voting
 spec:
   replicas: 2
-  template:
-    metadata:
-      labels:
-        environment: staging
-        managed-by: kustomize
-      annotations:
-        vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/staging/voting/config"
-    spec:
-      containers:
-        - name: voting
-          image: 8060633493/craftista-voting:dev-latest
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 400m
-              memory: 512Mi
