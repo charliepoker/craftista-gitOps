@@ -27,10 +27,6 @@ patches:
       kind: Ingress
       name: catalogue
 
-replicas:
-  - name: catalogue
-    count: 2
-
 images:
   - name: 8060633493/craftista-catalogue
     newTag: dev-latest

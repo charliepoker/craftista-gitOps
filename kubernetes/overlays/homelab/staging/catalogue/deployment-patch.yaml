@@ -3,6 +3,7 @@ kind: Rollout
 metadata:
   name: catalogue
 spec:
+  replicas: 2
   template:
     metadata:
       annotations:
