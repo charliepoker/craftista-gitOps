@@ -8,7 +8,3 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject-secret-config: "secret/data/craftista/staging/catalogue/config"
-    spec:
-      containers:
-        - name: catalogue
-          image: 8060633493/craftista-catalogue:staging-latest

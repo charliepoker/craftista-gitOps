@@ -10,11 +10,11 @@ commonLabels:
   environment: staging
 
 patches:
-  - path: deployment-patch.yaml
+  - path: rollout-patch.json
     target:
       kind: Rollout
       name: catalogue
-  - path: resources-patch.yaml
+  - path: resources-patch.json
     target:
       kind: Rollout
       name: catalogue
