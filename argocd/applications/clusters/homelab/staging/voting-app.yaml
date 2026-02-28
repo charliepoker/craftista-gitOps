@@ -39,7 +39,7 @@ spec:
 
   # Ignore differences for fields that are expected to change
   ignoreDifferences:
-    - group: apps
-      kind: Deployment
+    - group: argoproj.io
+      kind: Rollout
       jsonPointers:
-        - /spec/replicas # Ignore replica count changes (managed by HPA)
+        - /spec/replicas
