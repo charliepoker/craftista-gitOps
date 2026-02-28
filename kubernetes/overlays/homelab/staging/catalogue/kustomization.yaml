@@ -12,11 +12,11 @@ commonLabels:
 patches:
   - path: deployment-patch.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: catalogue
   - path: resources-patch.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: catalogue
   - path: configmap-patch.yaml
     target:

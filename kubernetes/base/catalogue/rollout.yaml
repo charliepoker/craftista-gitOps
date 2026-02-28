@@ -1,0 +1,106 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: catalogue
+  labels:
+    app: catalogue
+    component: api
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: catalogue
+  template:
+    metadata:
+      labels:
+        app: catalogue
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "catalogue"
+        vault.hashicorp.com/agent-inject-secret-mongodb: "secret/data/craftista/ENV/catalogue/mongodb"
+    spec:
+      serviceAccountName: catalogue
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
+      containers:
+        - name: catalogue
+          image: 8060633493/craftista-catalogue:latest
+          ports:
+            - containerPort: 5000
+              name: http
+              protocol: TCP
+          env:
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: FLASK_ENV
+            - name: FLASK_DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: FLASK_DEBUG
+            - name: DATA_SOURCE
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: DATA_SOURCE
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: LOG_LEVEL
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: catalogue-mongodb-secret
+                  key: uri
+            - name: MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: catalogue-mongodb-secret
+                  key: uri
+            - name: MONGODB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: catalogue-config
+                  key: MONGODB_DATABASE
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/products
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+  
+  strategy:
+    canary:
+      canaryService: catalogue-canary
+      stableService: catalogue
+      trafficRouting:
+        nginx:
+          stableIngress: catalogue
+      steps:
+        - setWeight: 20
+        - pause: {duration: 2m}
+        - setWeight: 50
+        - pause: {duration: 2m}
+        - setWeight: 80
+        - pause: {duration: 1m}

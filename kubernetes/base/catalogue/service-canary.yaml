@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalogue-canary
+  labels:
+    app: catalogue
+    component: api
+spec:
+  type: ClusterIP
+  selector:
+    app: catalogue
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+      protocol: TCP
