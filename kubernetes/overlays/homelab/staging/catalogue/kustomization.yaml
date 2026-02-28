@@ -18,6 +18,14 @@ patches:
     target:
       kind: Rollout
       name: catalogue
+  - path: service-patch.yaml
+    target:
+      kind: Service
+      name: catalogue
+  - path: service-patch.yaml
+    target:
+      kind: Service
+      name: catalogue-canary
   - path: configmap-patch.yaml
     target:
       kind: ConfigMap
