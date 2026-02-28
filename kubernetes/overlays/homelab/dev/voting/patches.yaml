@@ -15,10 +15,10 @@
   value: 256Mi
 - op: replace
   path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
-  value: 180
+  value: 240
 - op: replace
   path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
-  value: 180
+  value: 240
 - op: add
   path: /spec/template/metadata/labels/environment
   value: dev
