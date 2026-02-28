@@ -18,11 +18,11 @@ patches:
     target:
       kind: Rollout
       name: craftista-voting
-  - path: service-patch.yaml
+  - path: service-selector-patch.yaml
     target:
       kind: Service
       name: craftista-voting
-  - path: service-patch.yaml
+  - path: service-selector-patch.yaml
     target:
       kind: Service
       name: craftista-voting-canary
