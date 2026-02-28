@@ -13,11 +13,11 @@ patches:
   - path: rollout-patch.yaml
     target:
       kind: Rollout
-      name: craftista-voting
+      name: voting
   - path: patches.yaml
     target:
       kind: Rollout
-      name: craftista-voting
+      name: voting
   - path: service-selector-patch.yaml
     target:
       kind: Service
