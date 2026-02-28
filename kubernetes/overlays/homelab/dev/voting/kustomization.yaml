@@ -10,14 +10,22 @@ commonLabels:
   environment: dev
 
 patches:
-  - path: deployment-patch.yaml
+  - path: rollout-patch.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: voting
-  - path: resources-patch.yaml
+  - path: patches.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: voting
+  - path: service-selector-patch.yaml
+    target:
+      kind: Service
+      name: craftista-voting
+  - path: service-selector-patch.yaml
+    target:
+      kind: Service
+      name: craftista-voting-canary
   - path: configmap-patch.yaml
     target:
       kind: ConfigMap
@@ -26,11 +34,3 @@ patches:
     target:
       kind: Ingress
       name: voting
-
-replicas:
-  - name: voting
-    count: 1
-
-images:
-  - name: 8060633493/craftista-voting
-    newTag: develop-b6103ceb8f51ee5f2a16d4f169abc4309b1e5466
