@@ -19,3 +19,9 @@
 - op: add
   path: /spec/template/metadata/labels/managed-by
   value: kustomize
+- op: replace
+  path: /spec/template/spec/containers/0/livenessProbe/initialDelaySeconds
+  value: 120
+- op: replace
+  path: /spec/template/spec/containers/0/readinessProbe/initialDelaySeconds
+  value: 120
