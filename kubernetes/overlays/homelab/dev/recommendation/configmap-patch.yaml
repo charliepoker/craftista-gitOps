@@ -6,3 +6,4 @@ data:
   REDIS_DB: "0"
   LOG_LEVEL: "DEBUG"
   GIN_MODE: "debug"
+  REDIS_HOST: "redis-dev"
