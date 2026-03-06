@@ -9,21 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - webdemoapp.com
-        - www.webdemoapp.com
+        - frontend.webdemoapp.com
       secretName: frontend-prod-tls
   rules:
-    - host: webdemoapp.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 3000
-    - host: www.webdemoapp.com
+    - host: frontend.webdemoapp.com
       http:
         paths:
           - path: /
