@@ -19,6 +19,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: voting
+                name: craftista-voting
                 port:
                   number: 8080

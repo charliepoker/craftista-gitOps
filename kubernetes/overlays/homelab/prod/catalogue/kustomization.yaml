@@ -7,17 +7,25 @@ resources:
   - ../../../../base/catalogue
 
 commonLabels:
-  environment: prod
+  environment: production
 
 patches:
-  - path: deployment-patch.yaml
+  - path: rollout-patch.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: catalogue
-  - path: resources-patch.yaml
+  - path: patches.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: catalogue
+  - path: service-selector-patch.yaml
+    target:
+      kind: Service
+      name: catalogue
+  - path: service-selector-patch.yaml
+    target:
+      kind: Service
+      name: catalogue-canary
   - path: configmap-patch.yaml
     target:
       kind: ConfigMap
@@ -26,7 +34,3 @@ patches:
     target:
       kind: Ingress
       name: catalogue
-
-replicas:
-  - name: catalogue
-    count: 3

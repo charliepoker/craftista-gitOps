@@ -8,3 +8,4 @@ data:
   DATA_SOURCE: "mongodb"
   LOG_LEVEL: "WARNING"
   MONGODB_DATABASE: "catalogue"
+  MONGODB_HOST: "mongodb"

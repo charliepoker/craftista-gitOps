@@ -7,17 +7,25 @@ resources:
   - ../../../../base/frontend
 
 commonLabels:
-  environment: prod
+  environment: production
 
 patches:
-  - path: deployment-patch.yaml
+  - path: rollout-patch.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: frontend
-  - path: resources-patch.yaml
+  - path: patches.yaml
     target:
-      kind: Deployment
+      kind: Rollout
       name: frontend
+  - path: service-selector-patch.yaml
+    target:
+      kind: Service
+      name: frontend
+  - path: service-selector-patch.yaml
+    target:
+      kind: Service
+      name: frontend-canary
   - path: configmap-patch.yaml
     target:
       kind: ConfigMap
@@ -26,7 +34,3 @@ patches:
     target:
       kind: Ingress
       name: frontend
-
-replicas:
-  - name: frontend
-    count: 3

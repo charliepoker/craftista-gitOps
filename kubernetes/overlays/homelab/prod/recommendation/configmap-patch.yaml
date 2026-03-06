@@ -6,3 +6,4 @@ data:
   REDIS_DB: "0"
   LOG_LEVEL: "WARNING"
   GIN_MODE: "release"
+  REDIS_HOST: "redis"

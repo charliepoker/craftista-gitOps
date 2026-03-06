@@ -5,38 +5,32 @@ metadata:
   namespace: argocd
   labels:
     app: recommendation
-    environment: prod
+    environment: production
     component: api
 spec:
-  # Project reference
   project: craftista-homelab
-
-  # Source configuration
   source:
     repoURL: https://github.com/charliepoker/craftista-gitops.git
     targetRevision: main
-    path: kubernetes/overlays/prod/recommendation
-
-  # Destination configuration
+    path: kubernetes/overlays/homelab/prod/recommendation
   destination:
     server: https://kubernetes.default.svc
     namespace: craftista-prod
-
-  # Sync policy configuration - MANUAL SYNC FOR PRODUCTION
   syncPolicy:
-    # No automated sync for production - requires manual approval
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
     syncOptions:
-      - CreateNamespace=true # Automatically create namespace if it doesn't exist
+      - CreateNamespace=true
     retry:
       limit: 5
       backoff:
         duration: 5s
         factor: 2
         maxDuration: 3m
-
-  # Ignore differences for fields that are expected to change
   ignoreDifferences:
-    - group: apps
-      kind: Deployment
+    - group: argoproj.io
+      kind: Rollout
       jsonPointers:
-        - /spec/replicas # Ignore replica count changes (managed by HPA)
+        - /spec/replicas
