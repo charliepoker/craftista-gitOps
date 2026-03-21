@@ -76,3 +76,6 @@ vault-key.pem
 DEPLOYMENT_GUIDE.md
 04-phase-2-homelab-full-stack-step-by-step.md
 generate-vault-certs.sh
+
+# Ignore top-level docs directory
+/docs/

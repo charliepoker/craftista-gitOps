@@ -1,6 +1,6 @@
 - op: replace
   path: /spec/template/spec/containers/0/image
-  value: 8060633493/craftista-voting:dev-latest
+  value: 8060633493/craftista-voting:prod-latest
 - op: replace
   path: /spec/template/spec/containers/0/resources/requests/cpu
   value: 200m
