@@ -10,6 +10,9 @@ resources:
   - recommendation-secrets.yaml
   - voting-secrets.yaml
   - dockerhub-pull-secret.yaml
+  - mongodb-secrets.yaml
+  - postgres-secrets.yaml
+  - redis-secrets.yaml
 
 patches:
   - path: secret-store-patch.yaml
