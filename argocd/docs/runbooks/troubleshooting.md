@@ -277,7 +277,7 @@ kubectl get pod <pod-name> -n craftista-prod -o yaml | grep -A 10 "livenessProbe
    kubectl create secret docker-registry dockerhub-secret \
      --docker-server=docker.io \
      --docker-username=$DOCKERHUB_USERNAME \
-     --docker-password=$DOCKERHUB_PASSWORD \
+     --docker-password=$DOCKERHUB_TOKEN \
      -n craftista-prod
    ```
 

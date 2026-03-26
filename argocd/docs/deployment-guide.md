@@ -258,7 +258,7 @@ export MONGODB_URI="mongodb://username:password@docdb-cluster.cluster-xxx.us-eas
 export POSTGRES_URI="postgresql://username:password@rds-instance.xxx.us-east-1.rds.amazonaws.com:5432/voting"
 export REDIS_URI="redis://elasticache-cluster.xxx.cache.amazonaws.com:6379"
 export DOCKERHUB_USERNAME="your-dockerhub-username"
-export DOCKERHUB_PASSWORD="your-dockerhub-password"
+export DOCKERHUB_TOKEN="your-dockerhub-access-token"
 export SONARQUBE_TOKEN="your-sonarqube-token"
 
 # Sync secrets to Vault
