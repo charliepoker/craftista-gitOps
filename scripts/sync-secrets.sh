@@ -186,8 +186,7 @@ sync_frontend_secrets() {
 
     sync_secret "secret/craftista/${ENVIRONMENT}/frontend/api-keys" \
         "session_secret=${session_secret}" \
-        "jwt_secret=${jwt_secret}" \
-        "api_key=${api_key}"
+        "jwt_secret=${jwt_secret}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/frontend/config" \
         "node_env=${ENVIRONMENT}" \
@@ -221,11 +220,11 @@ sync_catalogue_secrets() {
 
     sync_secret "secret/craftista/${ENVIRONMENT}/catalogue/mongodb-credentials" \
         "username=${mongodb_username}" \
-        "password=${mongodb_password}"
+        "password=${mongodb_password}" \
+        "database=${mongodb_database}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/catalogue/mongodb-uri" \
-        "uri=${mongodb_uri}" \
-        "database=${mongodb_database}"
+        "connection_string=${mongodb_uri}/${mongodb_database}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/catalogue/config" \
         "flask_env=${ENVIRONMENT}" \
@@ -259,11 +258,12 @@ sync_voting_secrets() {
 
     sync_secret "secret/craftista/${ENVIRONMENT}/voting/postgres-credentials" \
         "username=${postgres_username}" \
-        "password=${postgres_password}"
+        "password=${postgres_password}" \
+        "database=${postgres_database}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/voting/postgres-uri" \
-        "uri=${postgres_uri}" \
-        "database=${postgres_database}"
+        "connection_string=${postgres_uri}/${postgres_database}" \
+        "jdbc_url=jdbc:postgresql://${postgres_uri#*://}/${postgres_database}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/voting/config" \
         "spring_profiles_active=${ENVIRONMENT}" \
@@ -279,20 +279,28 @@ sync_recommendation_secrets() {
 
     local redis_uri
     local redis_password
+    local redis_host
+    local redis_port
 
     if [[ "${INTERACTIVE}" == "true" ]]; then
         redis_uri=$(prompt_for_secret "Enter Redis URI" "${RECOMMENDATION_REDIS_URI:-}")
         redis_password=$(prompt_for_secret "Enter Redis password" "$(generate_random_secret 24)")
+        redis_host=$(prompt_for_secret "Enter Redis host" "${RECOMMENDATION_REDIS_HOST:-recommendation-redis}")
+        redis_port=$(prompt_for_secret "Enter Redis port" "${RECOMMENDATION_REDIS_PORT:-6379}")
     else
         redis_uri="${RECOMMENDATION_REDIS_URI:-redis://recommendation-redis:6379}"
         redis_password="${RECOMMENDATION_REDIS_PASSWORD:-$(generate_random_secret 24)}"
+        redis_host="${RECOMMENDATION_REDIS_HOST:-recommendation-redis}"
+        redis_port="${RECOMMENDATION_REDIS_PORT:-6379}"
     fi
 
     sync_secret "secret/craftista/${ENVIRONMENT}/recommendation/redis-credentials" \
         "password=${redis_password}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/recommendation/redis-uri" \
-        "uri=${redis_uri}"
+        "connection_string=${redis_uri}" \
+        "host=${redis_host}" \
+        "port=${redis_port}"
 
     sync_secret "secret/craftista/${ENVIRONMENT}/recommendation/config" \
         "environment=${ENVIRONMENT}" \
@@ -307,20 +315,20 @@ sync_common_secrets() {
     log_info "Syncing common secrets for ${ENVIRONMENT}..."
 
     local registry_username
-    local registry_password
+    local registry_token
 
     if [[ "${INTERACTIVE}" == "true" ]]; then
-        registry_username=$(prompt_for_secret "Enter Docker registry username" "${DOCKER_USERNAME:-}")
-        registry_password=$(prompt_for_secret "Enter Docker registry password" "${DOCKER_PASSWORD:-}")
+        registry_username=$(prompt_for_secret "Enter DockerHub username" "${DOCKERHUB_USERNAME:-${DOCKER_USERNAME:-}}")
+        registry_token=$(prompt_for_secret "Enter DockerHub access token" "${DOCKERHUB_TOKEN:-${DOCKERHUB_ACCESS_TOKEN:-${DOCKER_PASSWORD:-}}}")
     else
-        registry_username="${DOCKER_USERNAME:-}"
-        registry_password="${DOCKER_PASSWORD:-}"
+        registry_username="${DOCKERHUB_USERNAME:-${DOCKER_USERNAME:-}}"
+        registry_token="${DOCKERHUB_TOKEN:-${DOCKERHUB_ACCESS_TOKEN:-${DOCKER_PASSWORD:-}}}"
     fi
 
-    if [[ -n "${registry_username}" && -n "${registry_password}" ]]; then
+    if [[ -n "${registry_username}" && -n "${registry_token}" ]]; then
         sync_secret "secret/craftista/${ENVIRONMENT}/common/registry" \
-            "username=${registry_username}" \
-            "password=${registry_password}"
+            "dockerhub_username=${registry_username}" \
+            "dockerhub_token=${registry_token}"
     else
         log_warning "Skipping registry credentials (not provided)"
     fi
@@ -334,7 +342,7 @@ sync_cicd_secrets() {
     log_info "Syncing CI/CD secrets for GitHub Actions..."
 
     local dockerhub_username
-    local dockerhub_password
+    local dockerhub_token
     local sonarqube_token
     local sonarqube_url
     local gitops_private_key
@@ -347,7 +355,7 @@ sync_cicd_secrets() {
 
     if [[ "${INTERACTIVE}" == "true" ]]; then
         dockerhub_username=$(prompt_for_secret "Enter DockerHub username" "${DOCKERHUB_USERNAME:-}")
-        dockerhub_password=$(prompt_for_secret "Enter DockerHub access token" "${DOCKERHUB_ACCESS_TOKEN:-}")
+        dockerhub_token=$(prompt_for_secret "Enter DockerHub access token" "${DOCKERHUB_ACCESS_TOKEN:-}")
         sonarqube_token=$(prompt_for_secret "Enter SonarQube token" "${SONARQUBE_TOKEN:-}")
         sonarqube_url=$(prompt_for_secret "Enter SonarQube URL" "${SONARQUBE_URL:-}")
         gitops_private_key=$(prompt_for_secret "Enter GitOps deploy private key" "${GITOPS_PRIVATE_KEY:-}")
@@ -359,7 +367,7 @@ sync_cicd_secrets() {
         nexus_url=$(prompt_for_secret "Enter Nexus URL (optional)" "${NEXUS_URL:-}")
     else
         dockerhub_username="${DOCKERHUB_USERNAME:-}"
-        dockerhub_password="${DOCKERHUB_ACCESS_TOKEN:-}"
+        dockerhub_token="${DOCKERHUB_ACCESS_TOKEN:-}"
         sonarqube_token="${SONARQUBE_TOKEN:-}"
         sonarqube_url="${SONARQUBE_URL:-}"
         gitops_private_key="${GITOPS_PRIVATE_KEY:-}"
@@ -372,10 +380,10 @@ sync_cicd_secrets() {
     fi
 
     # DockerHub credentials
-    if [[ -n "${dockerhub_username}" && -n "${dockerhub_password}" ]]; then
+    if [[ -n "${dockerhub_username}" && -n "${dockerhub_token}" ]]; then
         sync_secret "secret/github-actions/dockerhub-credentials" \
             "username=${dockerhub_username}" \
-            "password=${dockerhub_password}" \
+            "password=${dockerhub_token}" \
             "registry=docker.io"
         log_success "DockerHub credentials synced"
     else

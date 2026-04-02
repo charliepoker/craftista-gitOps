@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: craftista-staging
+  labels:
+    name: craftista-staging
+    environment: staging
