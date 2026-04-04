@@ -34,3 +34,7 @@ patches:
     target:
       kind: Ingress
       name: frontend
+
+images:
+  - name: 8060633493/craftista-frontend
+    newTag: sha-6fb492f
