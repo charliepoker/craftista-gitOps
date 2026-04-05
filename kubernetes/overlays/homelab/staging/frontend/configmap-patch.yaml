@@ -5,5 +5,5 @@ metadata:
 data:
   NODE_ENV: "staging"
   PRODUCTS_API_BASE_URI: "http://catalogue.craftista-staging.svc.cluster.local:5000"
-  RECOMMENDATION_BASE_URI: "http://recommendation.craftista-staging.svc.cluster.local:8080"
-  VOTING_BASE_URI: "http://voting.craftista-staging.svc.cluster.local:8080"
+  RECOMMENDATION_BASE_URI: "http://recco.craftista-staging.svc.cluster.local:8080"
+  VOTING_BASE_URI: "http://craftista-voting.craftista-staging.svc.cluster.local:8080"
