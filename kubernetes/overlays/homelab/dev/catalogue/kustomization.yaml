@@ -37,4 +37,4 @@ patches:
 
 images:
   - name: 8060633493/craftista-catalogue
-    newTag: sha-be0328b
+    newTag: sha-54fe65a
