@@ -1,6 +1,6 @@
 - op: replace
   path: /spec/template/spec/containers/0/image
-  value: 8060633493/craftista-frontend:sha-f3138e0
+  value: 8060633493/craftista-frontend:sha-a04f045
 - op: replace
   path: /spec/template/spec/containers/0/resources/requests/cpu
   value: 50m

@@ -37,4 +37,4 @@ patches:
 
 images:
   - name: 8060633493/craftista-frontend
-    newTag: sha-f3138e0
+    newTag: sha-a04f045
