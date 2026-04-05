@@ -34,3 +34,7 @@ patches:
     target:
       kind: Ingress
       name: catalogue
+
+images:
+  - name: 8060633493/craftista-catalogue
+    newTag: sha-be0328b
