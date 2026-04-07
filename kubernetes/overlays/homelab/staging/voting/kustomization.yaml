@@ -34,3 +34,7 @@ patches:
     target:
       kind: Ingress
       name: voting
+
+images:
+  - name: 8060633493/craftista-voting
+    newTag: sha-be0328b

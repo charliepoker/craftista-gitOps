@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  tag: "staging-latest"
+  tag: "sha-be0328b"
 
 ingress:
   hosts:
@@ -54,7 +54,7 @@ postgresql:
 migration:
   enabled: true
   image:
-    tag: "staging-latest"
+    tag: "sha-be0328b"
 
 vault:
   enabled: true
